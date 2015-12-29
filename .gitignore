@@ -1,0 +1,26 @@
+*~
+*#
+.#*
+\#*#
+.*.sw[a-z]
+*.un~
+pkg/
+
+*.box
+
+# Berkshelf
+.vagrant
+/cookbooks
+
+Berksfile.lock
+
+# Bundler
+Gemfile.lock
+bin/*
+.bundle/*
+
+.kitchen/
+.kitchen.local.yml
+
+#Rubocop
+rubocop.html
