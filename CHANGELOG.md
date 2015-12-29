@@ -1,3 +1,7 @@
+4.0.1
+-----
+Fixes attribute name for double reboot
+
 4.0.0
 -----
 Created new git repo for public release on github
