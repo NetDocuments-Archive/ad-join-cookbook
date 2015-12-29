@@ -69,7 +69,7 @@ action :join do
     file 'c:\\Windows\\chef-ad-join.txt' do
       content "Placed by ad-join cookbook. Cookbook will keep rebooting windows until server is part of a domain and this file exists. DONT DELETE"
       action :create_if_missing
-      only_if { node['ad-join']['windows']['doublereboot'] == true }
+      only_if { node['ad-join']['windows']['double_reboot'] == true }
       notifies :reboot_now, 'reboot[Restart Computer]', :immediately
     end
 
