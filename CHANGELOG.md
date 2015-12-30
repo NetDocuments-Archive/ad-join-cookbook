@@ -1,3 +1,7 @@
+4.0.2
+-----
+Updates metadata for supermarket
+
 4.0.1
 -----
 Fixes attribute name for double reboot
