@@ -1,3 +1,7 @@
+4.1.0
+-----
+Fixes powershell error when vm name is same as bootstrap name.  issue #2
+
 4.0.2
 -----
 Updates metadata for supermarket
