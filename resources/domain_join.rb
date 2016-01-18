@@ -21,7 +21,6 @@ action :join do
   # Set the computer name to the same name provided by -N parameter in  knife boostrap -N 'node01'
   if Chef::Config[:node_name] != node['hostname'] and Chef::Config[:node_name] != node['fqdn']
     newcomputername = Chef::Config[:node_name]
-    
     # renew info about nodename on chef server after reload
     ohai 'reload' do
       action :reload
@@ -52,7 +51,14 @@ action :join do
       $password = "#{domain_password}" | ConvertTo-SecureString -asPlainText -Force
       $credential = New-Object System.Management.Automation.PSCredential($adminname,$password)
 
-      Rename-Computer -NewName #{newcomputername}
+      
+      if ( '#{newcomputername}' -eq $(hostname) ) {
+        Write-Host "Skipping computer rename since already named: #{newcomputername}"
+      }
+      else {
+        Write-Host "Renaming computer from $($hostname) to #{newcomputername}"
+        Rename-Computer -NewName '#{newcomputername}'
+      }
       sleep 5
       Add-computer -DomainName #{domain} -OUPath "#{ou}" -Credential $credential -force -Options JoinWithNewName,AccountCreate -PassThru #-Restart
 

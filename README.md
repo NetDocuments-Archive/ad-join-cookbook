@@ -25,6 +25,8 @@ It contains a custom resource named `domain_join` that takes 4 properties
 - domain_password
 - ou
 
+example:  
+
 ```ruby
 domain_join 'foobar' do
   domain          'example.com'
@@ -45,12 +47,15 @@ If you bootstrapped the node with the name option; e.g.
     
 Then that is the name that will be used to join the domain (not the hostname since windows randomly generates it on first boot)
 
+**The name cannot include control characters, leading or trailing spaces, or any of the following characters: / \\ [ ].**
+
+In most cases, Windows hostnames must be 15 characters or less. 
+
 The cookbook creates a windows scheduled task that runs chef as soon as the VM is started. The scheduled task is deleted after all the reboots. 
 
 The cookbook will restart windows twice since some group policy objects (like the time zone) are not applied on first boot. You can change this behavior by changing the following attribute to false. 
 
     default['ad-join']['windows']['double_reboot'] = true  
-
 
 
 License and Authors
