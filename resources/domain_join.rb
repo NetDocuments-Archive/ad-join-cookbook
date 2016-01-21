@@ -35,21 +35,38 @@ action :join do
   
   case node['os']
   when 'windows'
+    warning_caption = 'Chef is joining the domain'
+    warning_text = 'The chef cookbook ad-join is currently in the middle of joining the domain, and the server is about to be restarted'
+    warning_key = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System'
+
+    # Display a warning incase anyone remotes into the machine before all reboots have finished
+    # http://www.techrepublic.com/blog/windows-and-office/adding-messages-to-windows-7s-logon-screen/
+    registry_key 'warning' do
+      key warning_key
+      values [
+        {:name => 'legalnoticecaption', :type => :string, :data => warning_caption},
+        {:name => 'legalnoticetext', :type => :string, :data => warning_text}
+      ]
+      only_if { node['ad-join']['windows']['visual_warning'] == true }
+      action :nothing
+    end
+    
     # Installs task for chef-client run after reboot, needed for ohai reload
     windows_task 'chef ad-join' do
       user 'SYSTEM'
       command 'chef-client -L C:\chef\chef-ad-join.log'
       run_level :highest
       frequency :onstart
+      notifies :create, 'registry_key[warning]', :immediately
       only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
+      action :create
     end
-
+    
     powershell_script 'ad-join' do
       code <<-EOH
       $adminname = "#{domain}\\#{domain_user}"
       $password = "#{domain_password}" | ConvertTo-SecureString -asPlainText -Force
       $credential = New-Object System.Management.Automation.PSCredential($adminname,$password)
-
       
       if ( '#{newcomputername}' -eq $(hostname) ) {
         Write-Host "Skipping computer rename since already named: #{newcomputername}"
@@ -80,7 +97,8 @@ action :join do
 
     windows_task 'chef ad-join' do
       action :delete
-    end
+      notifies :delete, 'registry_key[warning]', :immediately
+    end   
 
   when 'linux'
     #TODO implement linux support

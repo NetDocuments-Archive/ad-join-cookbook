@@ -13,6 +13,16 @@ Tested on:
 
 Windows 2012R2  
 
+## Attributes
+
+
+    default['ad-join']['windows']['double_reboot'] = true
+
+Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windows\\chef-ad-join.txt` exists. 
+
+    default['ad-join']['windows']['visual_warning'] = false
+
+If double_reboot is true, it may take 5 to 10 minutes for windows VM to finish all reboots and fully converge. Display warning to users who remote in. Warning will go away once server is ready. 
 
 ## Usage
 
