@@ -33,12 +33,11 @@ action :join do
     action :nothing
   end
   
-  case node['platform']
+  case node['os']
   when 'windows'
     # Installs task for chef-client run after reboot, needed for ohai reload
     windows_task 'chef ad-join' do
       user 'SYSTEM'
-      cwd 'C:\chef\bin'
       command 'chef-client -L C:\chef\chef-ad-join.log'
       run_level :highest
       frequency :onstart
