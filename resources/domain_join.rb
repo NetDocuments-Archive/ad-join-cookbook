@@ -97,7 +97,7 @@ action :join do
 
     windows_task 'chef ad-join' do
       action :delete
-      notifies :delete, 'registry_key[warning]', :immediately
+      notifies :delete, 'registry_key[warning]', :delayed
     end   
 
   when 'linux'
