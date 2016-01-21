@@ -22,7 +22,7 @@ Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windo
 
     default['ad-join']['windows']['visual_warning'] = false
 
-If double_reboot is true, it may take 5 to 10 minutes for windows VM to finish all reboots and fully converge. Display warning to users who remote in. Warning will go away once server is ready. 
+If `visual_warning = true`, windows will display a login warning to anyone who connects via RDP to the machine before chef has finished the reboots and the converge. This will override any group policy your company might have in place for displaying custom login messages. 
 
 ![](http://cl.ly/3l1I1n3X0q1G/Screenshot%202016-01-21%2012.49.45.png)
 
