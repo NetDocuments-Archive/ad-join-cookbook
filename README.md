@@ -24,6 +24,8 @@ Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windo
 
 If double_reboot is true, it may take 5 to 10 minutes for windows VM to finish all reboots and fully converge. Display warning to users who remote in. Warning will go away once server is ready. 
 
+![](http://cl.ly/3l1I1n3X0q1G/Screenshot%202016-01-21%2012.49.45.png)
+
 ## Usage
 
 This cookbook is a library cookbook and is intended to be used by your own wrapper cookbook. See the [recipes directory](./recipes) for examples. 
