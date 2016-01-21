@@ -1,3 +1,8 @@
+4.2.0
+-----
+Fixes incorrect CWD in sched task (issue #3)
+Fixes incorrect ohai fact "node['os']"
+
 4.1.0
 -----
 Fixes powershell error when vm name is same as bootstrap name.  issue #2
