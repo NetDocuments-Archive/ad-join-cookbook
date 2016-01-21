@@ -1,3 +1,7 @@
+4.3.0
+-----
+Adds warning attribute
+
 4.2.0
 -----
 Fixes incorrect CWD in sched task (issue #3)
