@@ -19,7 +19,7 @@ default_action :join
 action :join do
   
   # Set the computer name to the same name provided by -N parameter in  knife boostrap -N 'node01'
-  if Chef::Config[:node_name] != node['hostname'] and Chef::Config[:node_name] != node['fqdn']
+  if Chef::Config[:node_name] != node['hostname'] and Chef::Config[:node_name] != node['fqdn'] and node['ad-join']['rename_server'] == true
     newcomputername = Chef::Config[:node_name]
     # renew info about nodename on chef server after reload
     ohai 'reload' do
