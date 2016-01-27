@@ -1,3 +1,7 @@
+4.4.0
+-----
+Adds new attribute default['ad-join']['windows']['update_hostname']
+
 4.3.0
 -----
 Adds warning attribute
