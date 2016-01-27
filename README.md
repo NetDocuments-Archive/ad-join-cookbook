@@ -15,7 +15,7 @@ Windows 2012R2
 
 ## Attributes
 
-    default['ad-join']['rename_server'] = true
+    default['ad-join']['windows']['update_hostname'] = true
     
 Set to false if you want the domain name/hostname to be different from the chef node name. (see [#5](https://github.com/NetDocuments/ad-join-cookbook/issues/5)).
 
