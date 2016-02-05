@@ -1,3 +1,8 @@
+4.5.0
+-----
+Fix: Passwords with special characters now work properly (#7 Thanks opsline-radek)
+Fix: OU Parameter is now truly optional (#6 Thanks opsline-radek)
+
 4.4.0
 -----
 Adds new attribute default['ad-join']['windows']['update_hostname']
