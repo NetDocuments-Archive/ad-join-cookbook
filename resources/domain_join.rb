@@ -2,7 +2,7 @@ resource_name :domain_join
 property :domain, String, required: true
 property :domain_user, String, required: true
 property :domain_password, String, required: true
-property :ou, String, required: false
+property :ou, [String, NilClass], required: false, default: nil
 
 default_action :join
 
@@ -65,7 +65,7 @@ action :join do
     powershell_script 'ad-join' do
       code <<-EOH
       $adminname = "#{domain}\\#{domain_user}"
-      $password = "#{domain_password}" | ConvertTo-SecureString -asPlainText -Force
+      $password = '#{domain_password}' | ConvertTo-SecureString -asPlainText -Force
       $credential = New-Object System.Management.Automation.PSCredential($adminname,$password)
       
       if ( '#{newcomputername}' -eq $(hostname) ) {
@@ -76,7 +76,7 @@ action :join do
         Rename-Computer -NewName '#{newcomputername}'
       }
       sleep 5
-      Add-computer -DomainName #{domain} -OUPath "#{ou}" -Credential $credential -force -Options JoinWithNewName,AccountCreate -PassThru #-Restart
+      Add-computer -DomainName #{domain} #{ou.nil? ? '' : '-OUPath "' + ou + '"'} -Credential $credential -force -Options JoinWithNewName,AccountCreate -PassThru #-Restart
 
       # Old way, somtimes Domain controller busy error occured
       # Add-Computer  #{newcomputername} -DomainName #{domain} -OUPath #{ou} -Credential $credential -Restart -PassThru
