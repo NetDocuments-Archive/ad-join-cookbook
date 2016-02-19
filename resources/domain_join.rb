@@ -3,6 +3,7 @@ property :domain, String, required: true
 property :domain_user, String, required: true
 property :domain_password, String, required: true
 property :ou, [String, NilClass], required: false, default: nil
+property :server, String, required: false, default: nil
 
 default_action :join
 
@@ -76,7 +77,7 @@ action :join do
         Rename-Computer -NewName '#{newcomputername}'
       }
       sleep 5
-      Add-computer -DomainName #{domain} #{ou.nil? ? '' : '-OUPath "' + ou + '"'} -Credential $credential -force -Options JoinWithNewName,AccountCreate -PassThru #-Restart
+      Add-computer -DomainName #{domain} #{ou.nil? ? '' : '-OUPath "' + ou + '"'} #{server.nil? ? '' : '-Server "' + server + '"'} -Credential $credential -force -Options JoinWithNewName,AccountCreate -PassThru #-Restart
 
       # Old way, somtimes Domain controller busy error occured
       # Add-Computer  #{newcomputername} -DomainName #{domain} -OUPath #{ou} -Credential $credential -Restart -PassThru
