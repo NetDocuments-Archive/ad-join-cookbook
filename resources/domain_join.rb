@@ -53,12 +53,12 @@ action :join do
     end
     
     # Installs task for chef-client run after reboot, needed for ohai reload
+    # Warning, windows_task can't send notifications https://github.com/chef-cookbooks/windows/issues/342
     windows_task 'chef ad-join' do
       user 'SYSTEM'
       command 'chef-client -L C:\chef\chef-ad-join.log'
       run_level :highest
       frequency :onstart
-      notifies :create, 'registry_key[warning]', :immediately
       only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
       action :create
     end
@@ -84,6 +84,7 @@ action :join do
       # Add-Computer -ComputerName Server01 -LocalCredential Server01\Admin01 -DomainName Domain02 -Credential Domain02\Admin02 -Restart -Force
       EOH
       only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
+      notifies :create, 'registry_key[warning]', :immediately
       notifies :reboot_now, 'reboot[Restart Computer]', :immediately
     end
     
