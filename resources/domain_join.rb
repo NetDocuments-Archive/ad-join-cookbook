@@ -99,8 +99,15 @@ action :join do
 
     windows_task 'chef ad-join' do
       action :delete
+    end  
+    
+    # Warning, windows_task can't send notifications https://github.com/chef-cookbooks/windows/issues/342
+    ruby_block 'remove chef ad-join warning' do
+      block do
+        puts "removing chef ad-join warning"
+      end
       notifies :delete, 'registry_key[warning]', :delayed
-    end   
+    end 
 
   when 'linux'
     #TODO implement linux support
