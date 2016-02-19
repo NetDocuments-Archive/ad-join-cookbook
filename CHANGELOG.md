@@ -1,3 +1,7 @@
+4.6.1
+-----
+Fix: Warning registry key not cleaned up
+
 4.6.0
 -----
 Add: 'server' parameter to allow for specifying a specific domain controller
