@@ -1,3 +1,8 @@
+4.6.0
+-----
+Add: 'server' parameter to allow for specifying a specific domain controller
+Fix: Warning message wouldn't be displayed (#4)
+
 4.5.0
 -----
 Fix: Passwords with special characters now work properly (#7 Thanks opsline-radek)
