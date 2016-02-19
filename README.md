@@ -49,7 +49,7 @@ domain_join 'foobar' do
   domain_user     'binduser'
   domain_password 'correct-horse-battery-staple'
   ou              'OU=US,OU=West,OU=Web,DC=example,DC=com'
-  server          'example.com\\DC01' #Optional
+  server          'DC01' #Optional
 end
 ```
 
