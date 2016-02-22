@@ -1,3 +1,8 @@
+4.7.0
+-----
+Improvement: Adds name to scheduled task, removing need for workaround http://bit.ly/1WDZ1kn
+Change: Changes c:\\windows\\chef-ad-join.txt to windows friendly path c:/windows/chef-ad-join.txt
+
 4.6.1
 -----
 Fix: Warning registry key not cleaned up

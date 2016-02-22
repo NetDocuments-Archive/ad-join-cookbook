@@ -53,13 +53,14 @@ action :join do
     end
     
     # Installs task for chef-client run after reboot, needed for ohai reload
-    # Warning, windows_task can't send notifications https://github.com/chef-cookbooks/windows/issues/342
     windows_task 'chef ad-join' do
+      task_name 'chef ad-join' # http://bit.ly/1WDZ1kn
       user 'SYSTEM'
       command 'chef-client -L C:\chef\chef-ad-join.log'
       run_level :highest
       frequency :onstart
       only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
+      notifies :create, 'registry_key[warning]', :immediately # http://bit.ly/1WDZ1kn
       action :create
     end
     
@@ -84,13 +85,12 @@ action :join do
       # Add-Computer -ComputerName Server01 -LocalCredential Server01\Admin01 -DomainName Domain02 -Credential Domain02\Admin02 -Restart -Force
       EOH
       only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
-      notifies :create, 'registry_key[warning]', :immediately
       notifies :reboot_now, 'reboot[Restart Computer]', :immediately
     end
     
     # Reboot the computer a second time
     # Needed on windows systems to apply some group policy objects (like timezone)
-    file 'c:\\Windows\\chef-ad-join.txt' do
+    file 'c:/Windows/chef-ad-join.txt' do
       content "Placed by ad-join cookbook. Cookbook will keep rebooting windows until server is part of a domain and this file exists. DONT DELETE"
       action :create_if_missing
       only_if { node['ad-join']['windows']['double_reboot'] == true }
@@ -98,16 +98,9 @@ action :join do
     end
 
     windows_task 'chef ad-join' do
+      notifies :delete, 'registry_key[warning]', :delayed
       action :delete
     end  
-    
-    # Warning, windows_task can't send notifications https://github.com/chef-cookbooks/windows/issues/342
-    ruby_block 'remove chef ad-join warning' do
-      block do
-        puts "removing chef ad-join warning"
-      end
-      notifies :delete, 'registry_key[warning]', :delayed
-    end 
 
   when 'linux'
     #TODO implement linux support
