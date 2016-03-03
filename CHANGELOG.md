@@ -1,3 +1,7 @@
+4.8.0
+-----
+Fix: No longer gives deprecation warnings if 'server' is nil. (#9)
+
 4.7.0
 -----
 Improvement: Adds name to scheduled task, removing need for workaround http://bit.ly/1WDZ1kn
