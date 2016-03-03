@@ -3,7 +3,7 @@ property :domain, String, required: true
 property :domain_user, String, required: true
 property :domain_password, String, required: true
 property :ou, [String, NilClass], required: false, default: nil
-property :server, String, required: false, default: nil
+property :server, [String, NilClass], required: false, default: nil
 
 default_action :join
 
