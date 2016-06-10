@@ -63,7 +63,18 @@ action :join do
       notifies :create, 'registry_key[warning]', :immediately # http://bit.ly/1WDZ1kn
       action :create
     end
-    
+
+    # Modify the start time to make sure GP doesn't set task into future
+    # https://github.com/NetDocuments/ad-join-cookbook/issues/13
+    # schedtask.exe won't allow this to be combined with task creation
+    windows_task 'chef ad-join' do
+      task_name 'chef ad-join' # http://bit.ly/1WDZ1kn
+      start_day '06/09/2016'
+      start_time '01:00'
+      only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
+      action :change
+    end
+
     powershell_script 'ad-join' do
       code <<-EOH
       $adminname = "#{domain}\\#{domain_user}"
