@@ -1,3 +1,7 @@
+4.9.0
+-----
+Fix: Scheduled task wont run if time zone changes on reboot (#13)
+
 4.8.0
 -----
 Fix: No longer gives deprecation warnings if 'server' is nil. (#9)
