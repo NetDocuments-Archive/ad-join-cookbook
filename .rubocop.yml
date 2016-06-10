@@ -1,0 +1,11 @@
+AllCops:
+  Exclude:
+    - Rakefile
+    - metadata.rb
+    - test/Rakefile
+
+Metrics/LineLength:
+  Max: 220
+
+Lint/ParenthesesAsGroupedExpression:
+  Enabled: false

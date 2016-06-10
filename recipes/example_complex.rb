@@ -8,7 +8,7 @@
 #     "site": "Sydney",
 #     "region": "AU",
 #     "domains": [ "example","com" ]
-# 
+#
 # }
 
 # Desired outcome
@@ -20,28 +20,28 @@ ou_region  = node['foo']['region']
 dc_domains = node['foo']['domains']
 
 # Take the 3 OU's and make one long OU string
-theOU = [ ou_type, ou_site, ou_region, 'Servers']
-theOU = theOU.compact #Remove undefined / nil values
-theOUString = ""
-theOU.each do |anOU|
-  theOUString << "OU=#{anOU},"
+the_ou = [ou_type, ou_site, ou_region, 'Servers']
+the_ou = the_ou.compact # Remove undefined / nil values
+the_ou_string = ''
+the_ou.each do |anOU|
+  the_ou_string << "OU=#{anOU},"
 end
 # OU=Web,OU=Sydney,OU=AU,OU=Servers
-theOUString = theOUString.chomp(',') #Remove trailing comma
+the_ou_string = the_ou_string.chomp(',') # Remove trailing comma
 
 # Take the DC's and make one long DC string
-theDCString = ""
+the_dc_string = ''
 dc_domains.each do |aDC|
-  theDCString << "DC=#{aDC},"
+  the_dc_string << "DC=#{aDC},"
 end
 # DC=example,DC=com
-theDCString = theDCString.chomp(',') #Remove trailing comma
+the_dc_string = the_dc_string.chomp(',') # Remove trailing comma
 
-Chef::Log.info "ad-join string is #{theOUString},#{theDCString}"
+Chef::Log.info "ad-join string is #{the_ou_string},#{the_dc_string}"
 
 domain_join 'foobar' do
-  domain          node['foo']['domains'].join('.')  # example.com
-  domain_user     'binduser'
-  domain_password data_bag_item('users','binduser')['password']
-  ou              "#{theOUString},#{theDCString}" # OU=Web,OU=Sydney,OU=AU,OU=Servers,DC=example,DC=com
+  domain node['foo']['domains'].join('.')  # example.com
+  domain_user 'binduser'
+  domain_password data_bag_item('users', 'binduser')['password']
+  ou "#{the_ou_string},#{the_dc_string}" # OU=Web,OU=Sydney,OU=AU,OU=Servers,DC=example,DC=com
 end

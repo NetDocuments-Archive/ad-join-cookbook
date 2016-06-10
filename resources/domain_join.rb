@@ -18,9 +18,8 @@ default_action :join
 # PrimaryDomainController = 5
 
 action :join do
-  
   # Set the computer name to the same name provided by -N parameter in  knife boostrap -N 'node01'
-  if Chef::Config[:node_name] != node['hostname'] and Chef::Config[:node_name] != node['fqdn'] and node['ad-join']['windows']['update_hostname'] == true
+  if Chef::Config[:node_name] != node['hostname'] && Chef::Config[:node_name] != node['fqdn'] && node['ad-join']['windows']['update_hostname'] == true
     newcomputername = Chef::Config[:node_name]
     # renew info about nodename on chef server after reload
     ohai 'reload' do
@@ -29,11 +28,11 @@ action :join do
   else
     newcomputername = node['hostname']
   end
-  
+
   reboot 'Restart Computer' do
     action :nothing
   end
-  
+
   case node['os']
   when 'windows'
     warning_caption = 'Chef is joining the domain'
@@ -45,13 +44,13 @@ action :join do
     registry_key 'warning' do
       key warning_key
       values [
-        {:name => 'legalnoticecaption', :type => :string, :data => warning_caption},
-        {:name => 'legalnoticetext', :type => :string, :data => warning_text}
+        { name: 'legalnoticecaption', type: :string, data: warning_caption },
+        { name: 'legalnoticetext', type: :string, data: warning_text }
       ]
       only_if { node['ad-join']['windows']['visual_warning'] == true }
       action :nothing
     end
-    
+
     # Installs task for chef-client run after reboot, needed for ohai reload
     windows_task 'chef ad-join' do
       task_name 'chef ad-join' # http://bit.ly/1WDZ1kn
@@ -80,7 +79,7 @@ action :join do
       $adminname = "#{domain}\\#{domain_user}"
       $password = '#{domain_password}' | ConvertTo-SecureString -asPlainText -Force
       $credential = New-Object System.Management.Automation.PSCredential($adminname,$password)
-      
+
       if ( '#{newcomputername}' -eq $(hostname) ) {
         Write-Host "Skipping computer rename since already named: #{newcomputername}"
       }
@@ -98,11 +97,11 @@ action :join do
       only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
       notifies :reboot_now, 'reboot[Restart Computer]', :immediately
     end
-    
+
     # Reboot the computer a second time
     # Needed on windows systems to apply some group policy objects (like timezone)
     file 'c:/Windows/chef-ad-join.txt' do
-      content "Placed by ad-join cookbook. Cookbook will keep rebooting windows until server is part of a domain and this file exists. DONT DELETE"
+      content 'Placed by ad-join cookbook. Cookbook will keep rebooting windows until server is part of a domain and this file exists. DONT DELETE'
       action :create_if_missing
       only_if { node['ad-join']['windows']['double_reboot'] == true }
       notifies :reboot_now, 'reboot[Restart Computer]', :immediately
@@ -111,18 +110,17 @@ action :join do
     windows_task 'chef ad-join' do
       notifies :delete, 'registry_key[warning]', :delayed
       action :delete
-    end  
+    end
 
   when 'linux'
-    #TODO implement linux support
-    Chef::Log.fatal("Only windows currently supported, linux support planned for future release")
+    # TODO: implement linux support
+    Chef::Log.fatal('Only windows currently supported, linux support planned for future release')
   else
     Chef::Log.fatal("Platform: #{node['platform']} not supported")
   end
-  
 end
 
-#TODO implement domain leave actions
+# TODO: implement domain leave actions
 # action :leave do
-#   
+#
 # end
