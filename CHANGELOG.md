@@ -1,3 +1,7 @@
+4.9.1
+-----
+Feature: add domain_unjoin resource to handle removing systems from the active directory domain.
+
 4.9.0
 -----
 Fix: Scheduled task wont run if time zone changes on reboot (#13)
