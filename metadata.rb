@@ -9,3 +9,6 @@ version          '4.9.1'
 depends 'windows', '>= 1.36.0'
 
 supports 'windows'
+
+issues_url 'https://github.com/NetDocuments/ad-join-cookbook/issues'
+source_url 'https://github.com/NetDocuments/ad-join-cookbook.git'
