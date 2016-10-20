@@ -120,7 +120,55 @@ action :join do
   end
 end
 
-# TODO: implement domain leave actions
-# action :leave do
-#
-# end
+action :leave do
+    
+  reboot 'Restart Computer' do
+    action :nothing
+  end
+
+  case node['os']
+  when 'windows'
+    warning_caption = 'Chef is leaving the domain'
+    warning_text = 'The chef cookbook ad-join is currently in the middle of leaving the domain, and the server is about to be restarted'
+    warning_key = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System'
+
+    # Display a warning incase anyone remotes into the machine before all reboots have finished
+    # http://www.techrepublic.com/blog/windows-and-office/adding-messages-to-windows-7s-logon-screen/
+    registry_key 'warning' do
+      key warning_key
+      values [
+        { name: 'legalnoticecaption', type: :string, data: warning_caption },
+        { name: 'legalnoticetext', type: :string, data: warning_text }
+      ]
+      only_if { node['ad-join']['windows']['visual_warning'] == true }
+      action :nothing
+    end
+
+    powershell_script 'ad-join-leave' do
+      code <<-EOH
+      $adminname = "#{domain}\\#{domain_user}"
+      $password = '#{domain_password}' | ConvertTo-SecureString -asPlainText -Force
+      $credential = New-Object System.Management.Automation.PSCredential($adminname,$password)
+
+      Remove-Computer -UnjoinDomainCredential $credential -Force -PassThru
+      EOH
+      only_if { node['kernel']['cs_info']['domain_role'].to_i == 1 || node['kernel']['cs_info']['domain_role'].to_i == 3 }
+      notifies :reboot_now, 'reboot[Restart Computer]', :delayed
+    end
+
+    file 'C:/Windows/chef-ad-join.txt' do
+      action :delete
+    end
+
+    registry_key 'warning-delete' do
+      key warning_key
+      action :delete
+    end
+
+  when 'linux'
+    # TODO: implement linux support
+    Chef::Log.fatal('Only windows currently supported, linux support planned for future release')
+  else
+    Chef::Log.fatal("Platform: #{node['platform']} not supported")
+  end
+end
