@@ -53,8 +53,33 @@ domain_join 'foobar' do
 end
 ```
 
-The ou must be formatted with `OU=` before each organizational unit and `DC=` before each domain component. see [recipes/example_complex.rb](./recipes/example_complex.rb) for an example of how to derive the OU from attributes. 
+The ou must be formatted with `OU=` before each organizational unit and `DC=` before each domain component. see [recipes/example_complex.rb](./recipes/example_complex.rb) for an example of how to derive the OU from attributes.
 
+It contains a customer resource named `domain_unjoin` that takes 5 properties
+
+- domain_user: user domain to perform the unjoin action
+- domain_password: user domain password to perform the unjoin action
+- restart (Optional, default true): NilClass, performs a restart of the system after the unjoin.
+
+example:  
+
+# Will restart the system after the computer is removed from the domain
+```ruby
+domain_unjoin 'foobar' do
+  domain_user     'binduser'
+  domain_password 'correct-horse-battery-staple'
+  restart true
+end
+```
+
+# Will not restart the system after the computer is removed from the domain, must be manually done later.
+```ruby
+domain_unjoin 'foobar' do
+  domain_user     'binduser'
+  domain_password 'correct-horse-battery-staple'
+  restart false
+end
+```
 
 ### Behind the scenes
 
@@ -79,4 +104,5 @@ License and Authors
 -------------------
 Authors:  
 Volodymyr Babchynskyy vbabch@softserveinc.com  
-Spencer Owen sowen@netdocuments.com  
+Spencer Owen sowen@netdocuments.com
+Derek Groh derekgroh@gmail.com
