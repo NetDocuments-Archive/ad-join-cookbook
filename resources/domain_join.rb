@@ -153,15 +153,38 @@ action :leave do
       Remove-Computer -UnjoinDomainCredential $credential -Force -PassThru
       EOH
       only_if { node['kernel']['cs_info']['domain_role'].to_i == 1 || node['kernel']['cs_info']['domain_role'].to_i == 3 }
-      notifies :reboot_now, 'reboot[Restart Computer]', :delayed
+      notifies :reboot_now, 'reboot[Restart Computer]', :immediately
+    end
+
+     # Installs task for chef-client run after reboot, needed for ohai reload
+    windows_task 'chef ad-join leave' do
+      task_name 'chef ad-join leave' # http://bit.ly/1WDZ1kn
+      user 'SYSTEM'
+      command 'chef-client -L C:\chef\chef-ad-join.log'
+      run_level :highest
+      frequency :onstart
+      only_if { node['kernel']['cs_info']['domain_role'].to_i == 1 || node['kernel']['cs_info']['domain_role'].to_i == 3 }
+      notifies :create, 'registry_key[warning]', :immediately # http://bit.ly/1WDZ1kn
+      action :create
+    end
+
+    # Modify the start time to make sure GP doesn't set task into future
+    # https://github.com/NetDocuments/ad-join-cookbook/issues/13
+    # schedtask.exe won't allow this to be combined with task creation
+    windows_task 'chef ad-join leave' do
+      task_name 'chef ad-join leave' # http://bit.ly/1WDZ1kn
+      start_day '06/09/2016'
+      start_time '01:00'
+      only_if { node['kernel']['cs_info']['domain_role'].to_i == 1 || node['kernel']['cs_info']['domain_role'].to_i == 3 }
+      action :change
     end
 
     file 'C:/Windows/chef-ad-join.txt' do
       action :delete
     end
 
-    registry_key 'warning-delete' do
-      key warning_key
+    windows_task 'chef ad-join leave' do
+      notifies :delete, 'registry_key[warning]', :delayed
       action :delete
     end
 
