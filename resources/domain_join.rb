@@ -144,19 +144,7 @@ action :leave do
       action :nothing
     end
 
-    powershell_script 'ad-join-leave' do
-      code <<-EOH
-      $adminname = "#{domain}\\#{domain_user}"
-      $password = '#{domain_password}' | ConvertTo-SecureString -asPlainText -Force
-      $credential = New-Object System.Management.Automation.PSCredential($adminname,$password)
-
-      Remove-Computer -UnjoinDomainCredential $credential -Force -PassThru
-      EOH
-      only_if { node['kernel']['cs_info']['domain_role'].to_i == 1 || node['kernel']['cs_info']['domain_role'].to_i == 3 }
-      notifies :reboot_now, 'reboot[Restart Computer]', :immediately
-    end
-
-     # Installs task for chef-client run after reboot, needed for ohai reload
+    # Installs task for chef-client run after reboot, needed for ohai reload
     windows_task 'chef ad-join leave' do
       task_name 'chef ad-join leave' # http://bit.ly/1WDZ1kn
       user 'SYSTEM'
@@ -177,6 +165,18 @@ action :leave do
       start_time '01:00'
       only_if { node['kernel']['cs_info']['domain_role'].to_i == 1 || node['kernel']['cs_info']['domain_role'].to_i == 3 }
       action :change
+    end
+
+    powershell_script 'ad-join-leave' do
+      code <<-EOH
+      $adminname = "#{domain}\\#{domain_user}"
+      $password = '#{domain_password}' | ConvertTo-SecureString -asPlainText -Force
+      $credential = New-Object System.Management.Automation.PSCredential($adminname,$password)
+
+      Remove-Computer -UnjoinDomainCredential $credential -Force -PassThru
+      EOH
+      only_if { node['kernel']['cs_info']['domain_role'].to_i == 1 || node['kernel']['cs_info']['domain_role'].to_i == 3 }
+      notifies :reboot_now, 'reboot[Restart Computer]', :immediately
     end
 
     file 'C:/Windows/chef-ad-join.txt' do
