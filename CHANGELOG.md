@@ -1,3 +1,7 @@
+4.10.0
+------
+Adds domain leave functionality (#16 metalseargolid)
+
 4.9.0
 -----
 Fix: Scheduled task wont run if time zone changes on reboot (#13)
