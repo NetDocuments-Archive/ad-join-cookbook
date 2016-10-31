@@ -33,6 +33,11 @@ If `visual_warning = true`, windows will display a login warning to anyone who c
 
 This cookbook is a library cookbook and is intended to be used by your own wrapper cookbook. See the [recipes directory](./recipes) for examples. 
 
+### Actions
+
+- join
+- leave
+
 It contains a custom resource named `domain_join` that takes 5 properties
 
 - domain
@@ -50,6 +55,7 @@ domain_join 'foobar' do
   domain_password 'correct-horse-battery-staple'
   ou              'OU=US,OU=West,OU=Web,DC=example,DC=com'
   server          'DC01' #Optional
+  action :join
 end
 ```
 
