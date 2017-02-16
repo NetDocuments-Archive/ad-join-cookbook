@@ -20,6 +20,9 @@ default_action :join
 action :join do
   # Set the computer name to the same name provided by -N parameter in  knife boostrap -N 'node01'
   if Chef::Config[:node_name] != node['hostname'] && Chef::Config[:node_name] != node['fqdn'] && node['ad-join']['windows']['update_hostname'] == true
+    # Abort if hostname is more than 15 characters long on windows
+    raise if node['os'] == 'windows' && Chef::Config[:node_name].length > 15
+
     newcomputername = Chef::Config[:node_name]
     # renew info about nodename on chef server after reload
     ohai 'reload' do

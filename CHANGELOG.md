@@ -1,3 +1,7 @@
+4.11.0
+------
+Abort if hostname is longer than 15 characters on windows
+
 4.10.0
 ------
 Adds domain leave functionality (#16 metalseargolid)
