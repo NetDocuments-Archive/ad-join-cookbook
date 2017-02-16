@@ -1,3 +1,7 @@
+4.11.1
+------
+Fix berkshelf supermarket url
+
 4.11.0
 ------
 Abort if hostname is longer than 15 characters on windows
