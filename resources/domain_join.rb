@@ -69,7 +69,7 @@ action :join do
     # Modify the start time to make sure GP doesn't set task into future
     # https://github.com/NetDocuments/ad-join-cookbook/issues/13
     # schedtask.exe won't allow this to be combined with task creation
-    windows_task 'chef ad-join' do
+    windows_task 'modify sched task start time' do
       task_name 'chef ad-join' # http://bit.ly/1WDZ1kn
       start_day '06/09/2016'
       start_time '01:00'
@@ -79,7 +79,7 @@ action :join do
 
     powershell_script 'ad-join' do
       code <<-EOH
-      $adminname = "#{domain}\\#{domain_user}"
+      $adminname = "#{new_resource.domain}\\#{domain_user}"
       $password = '#{domain_password}' | ConvertTo-SecureString -asPlainText -Force
       $credential = New-Object System.Management.Automation.PSCredential($adminname,$password)
 
@@ -91,10 +91,10 @@ action :join do
         Rename-Computer -NewName '#{newcomputername}'
       }
       sleep 5
-      Add-computer -DomainName #{domain} #{ou.nil? ? '' : '-OUPath "' + ou + '"'} #{server.nil? ? '' : '-Server "' + server + '"'} -Credential $credential -force -Options JoinWithNewName,AccountCreate -PassThru #-Restart
+      Add-computer -DomainName #{new_resource.domain} #{ou.nil? ? '' : '-OUPath "' + ou + '"'} #{server.nil? ? '' : '-Server "' + server + '"'} -Credential $credential -force -Options JoinWithNewName,AccountCreate -PassThru #-Restart
 
       # Old way, somtimes Domain controller busy error occured
-      # Add-Computer  #{newcomputername} -DomainName #{domain} -OUPath #{ou} -Credential $credential -Restart -PassThru
+      # Add-Computer  #{newcomputername} -DomainName #{new_resource.domain} -OUPath #{ou} -Credential $credential -Restart -PassThru
       # Add-Computer -ComputerName Server01 -LocalCredential Server01\Admin01 -DomainName Domain02 -Credential Domain02\Admin02 -Restart -Force
       EOH
       only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
@@ -162,7 +162,7 @@ action :leave do
     # Modify the start time to make sure GP doesn't set task into future
     # https://github.com/NetDocuments/ad-join-cookbook/issues/13
     # schedtask.exe won't allow this to be combined with task creation
-    windows_task 'chef ad-join leave' do
+    windows_task 'chef ad-join leave start time' do
       task_name 'chef ad-join leave' # http://bit.ly/1WDZ1kn
       start_day '06/09/2016'
       start_time '01:00'
@@ -186,7 +186,8 @@ action :leave do
       action :delete
     end
 
-    windows_task 'chef ad-join leave' do
+    windows_task 'chef ad-join task delete' do
+      task_name 'chef ad-join leave' # http://bit.ly/1WDZ1kn
       notifies :delete, 'registry_key[warning]', :delayed
       action :delete
     end
