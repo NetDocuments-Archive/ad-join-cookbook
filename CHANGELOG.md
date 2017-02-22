@@ -1,3 +1,8 @@
+4.12.0
+------
+Fixes issue #19
+Fixes deprecation warning for chef 13
+
 4.11.1
 ------
 Fix berkshelf supermarket url
