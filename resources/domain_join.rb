@@ -186,7 +186,7 @@ action :leave do
       action :delete
     end
 
-    windows_task 'Ensure chef ad-join leave task was delete' do
+    windows_task 'Ensure chef ad-join leave task was deleted' do
       task_name 'chef ad-join leave' # http://bit.ly/1WDZ1kn
       notifies :delete, 'registry_key[warning]', :delayed
       action :delete
