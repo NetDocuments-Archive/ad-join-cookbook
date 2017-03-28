@@ -110,7 +110,7 @@ action :join do
       notifies :reboot_now, 'reboot[Restart Computer]', :immediately
     end
 
-    windows_task 'chef ad-join' do
+    windows_task 'Ensure chef ad-join task was deleted' do
       notifies :delete, 'registry_key[warning]', :delayed
       action :delete
     end
@@ -124,7 +124,7 @@ action :join do
 end
 
 action :leave do
-    
+
   reboot 'Restart Computer' do
     action :nothing
   end
@@ -186,7 +186,7 @@ action :leave do
       action :delete
     end
 
-    windows_task 'chef ad-join task delete' do
+    windows_task 'Ensure chef ad-join leave task was delete' do
       task_name 'chef ad-join leave' # http://bit.ly/1WDZ1kn
       notifies :delete, 'registry_key[warning]', :delayed
       action :delete
