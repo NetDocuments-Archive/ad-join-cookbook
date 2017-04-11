@@ -116,8 +116,47 @@ action :join do
     end
 
   when 'linux'
-    # TODO: implement linux support
-    Chef::Log.fatal('Only windows currently supported, linux support planned for future release')
+    
+    include_recipe 'apt::default'
+
+    case node['platform_version']
+    when '16.04'
+        %w(realmd sssd-tools sssd libnss-sss libpam-sss adcli packagekit).each do |pkg|
+          package pkg do
+            action :install
+          end
+        end
+
+        execute 'realm join' do
+          command <<-EOH
+          echo '#{domain_password}' | sudo realm join --verbose #{new_resource.domain} --user #{domain_user}@#{new_resource.domain} --computer-ou #{ou}
+          EOH
+          action :run
+          # `${domain,,}` converts to down case in bash (4.0)
+          # #{new_resource.domain.downcase} converts to downcase in ruby
+          #TODO fix the logic here
+          not_if <<-EOH
+          domain=$(sudo realm list -n| tr '[:upper:]' '[:lower:]');
+          echo domain is ${domain} > /tmp/domain; 
+          echo "resource domain is #{new_resource.domain.downcase}" >> /tmp/domain; 
+          if [ "${domain}" != "#{new_resource.domain.downcase}" ]; then 
+            echo "${domain} doesnt match #{new_resource.domain.downcase}" >> /tmp/domain;
+            exit 1;
+          else 
+            echo "${domain} matches #{new_resource.domain.downcase}" >> /tmp/domain;
+            exit 0;
+          fi
+
+          EOH
+          sensitive true
+          # TODO: do I need to restart ohai?
+        end
+
+        # http://serverfault.com/questions/811033/sssd-allow-login-with-both-short-and-log-domain-credentials/811034#811034
+
+    else 
+      Chef::Log.fatal("Only Ubuntu 16.04 currently supported. Found: #{node['platform']}")
+    end
   else
     Chef::Log.fatal("Platform: #{node['platform']} not supported")
   end
@@ -193,8 +232,8 @@ action :leave do
     end
 
   when 'linux'
-    # TODO: implement linux support
-    Chef::Log.fatal('Only windows currently supported, linux support planned for future release')
+    
+
   else
     Chef::Log.fatal("Platform: #{node['platform']} not supported")
   end

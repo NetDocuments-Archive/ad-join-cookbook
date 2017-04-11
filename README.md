@@ -1,7 +1,7 @@
 ad-join Cookbook
 ============================
 
-This is a library cookbook that will join a windows computer to a windows AD domain
+This is a library cookbook that will join a  computer to a windows AD domain
 
 ## Requirements
 
@@ -12,6 +12,17 @@ This leverages [custom resources](https://docs.chef.io/custom_resources.html) so
 Tested on:
 
 Windows 2012R2  
+Ubuntu 16.04
+
+## Ubuntu 
+
+This cookbook has limited support for linux. Common pitfalls
+
+- Hostname must be 15 characters or less
+- Domain is cAsE SenSITive
+- Domain join password will be present in chef logs. No way around it since realmd only supports passwords from stdin. Cookbook uses 'sensitive' to mitigate this exposure.
+
+See troubleshooting section at bottom for additional information
 
 ## Attributes
 
@@ -79,6 +90,22 @@ The cookbook creates a windows scheduled task that runs chef as soon as the VM i
 The cookbook will restart windows twice since some group policy objects (like the time zone) are not applied on first boot. You can change this behavior by changing the following attribute to false. 
 
     default['ad-join']['windows']['double_reboot'] = true  
+
+
+## Troubleshooting
+
+```
+realm: Not authorized to perform this action
+````
+
+Not all packages installed succesfully. Verify adcli and packagekit are installed
+
+```
+! Couldn't get kerberos ticket for: foo@example.com: KDC reply did not match expectations
+adcli: couldn't connect to example.com domain: Couldn't get kerberos ticket for: foo@example.com: KDC reply did not match expectations
+```
+
+The domain is case sensitive. Try changing `example.com` to `EXAMPLE.COM`
 
 
 License and Authors

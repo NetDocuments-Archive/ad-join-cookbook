@@ -9,6 +9,7 @@ source_url       'https://github.com/NetDocuments/ad-join-cookbook'
 version          '4.12.1'
 
 depends 'windows', '>= 1.36.0'
+depends 'apt', '~> 6.0.1'
 
 supports 'windows'
 
