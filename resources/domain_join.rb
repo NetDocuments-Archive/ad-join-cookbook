@@ -128,27 +128,24 @@ action :join do
         end
 
         execute 'realm join' do
+          environment 'DOMAIN_PASS' => domain_password
           command <<-EOH
-          echo '#{domain_password}' | sudo realm join --verbose #{new_resource.domain} --user #{domain_user}@#{new_resource.domain} --computer-ou #{ou}
+          echo "${DOMAIN_PASS}" | sudo realm join --verbose #{new_resource.domain} --user #{domain_user}@#{new_resource.domain} --computer-ou #{ou}
           EOH
-          action :run
-          # `${domain,,}` converts to down case in bash (4.0)
-          # #{new_resource.domain.downcase} converts to downcase in ruby
-          #TODO fix the logic here
           not_if <<-EOH
           domain=$(sudo realm list -n| tr '[:upper:]' '[:lower:]');
-          echo domain is ${domain} > /tmp/domain; 
-          echo "resource domain is #{new_resource.domain.downcase}" >> /tmp/domain; 
+          # echo domain is ${domain} > /tmp/domain; 
+          # echo "resource domain is #{new_resource.domain.downcase}" >> /tmp/domain; 
           if [ "${domain}" != "#{new_resource.domain.downcase}" ]; then 
-            echo "${domain} doesnt match #{new_resource.domain.downcase}" >> /tmp/domain;
+            # echo "${domain} doesnt match #{new_resource.domain.downcase}" >> /tmp/domain;
             exit 1;
           else 
-            echo "${domain} matches #{new_resource.domain.downcase}" >> /tmp/domain;
+            # echo "${domain} matches #{new_resource.domain.downcase}" >> /tmp/domain;
             exit 0;
           fi
 
           EOH
-          sensitive true
+          # sensitive true
           # TODO: do I need to restart ohai?
         end
 

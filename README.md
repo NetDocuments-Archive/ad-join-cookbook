@@ -20,7 +20,7 @@ This cookbook has limited support for linux. Common pitfalls
 
 - Hostname must be 15 characters or less
 - Domain is cAsE SenSITive
-- Domain join password will be present in chef logs. No way around it since realmd only supports passwords from stdin. Cookbook uses 'sensitive' to mitigate this exposure.
+- If the domain join fails, the domain password may be logged on the chef server in plain text. Take caution to roll your logs if that happens.
 
 See troubleshooting section at bottom for additional information
 
@@ -93,6 +93,11 @@ The cookbook will restart windows twice since some group policy objects (like th
 
 
 ## Troubleshooting
+
+```
+realm: No such realm found
+```
+Realm is case sensitive. Try EXAMPLE.COM instead of example.com
 
 ```
 realm: Not authorized to perform this action
