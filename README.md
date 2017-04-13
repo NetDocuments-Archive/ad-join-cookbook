@@ -22,6 +22,8 @@ This cookbook has limited support for linux. Common pitfalls
 - Domain is cAsE SenSITive
 - If the domain join fails, the domain password may be logged on the chef server in plain text. Take caution to roll your logs if that happens.
 
+**The ad-join cookbook is as unopinionated as possible. It will not configure sudoers file or sssd.conf file. Use the sudoers or sssd cookbook in your wrapper cookbook to manage those services.**
+
 See troubleshooting section at bottom for additional information
 
 ## Attributes

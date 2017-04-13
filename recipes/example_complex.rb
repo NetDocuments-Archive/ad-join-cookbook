@@ -45,3 +45,12 @@ domain_join 'foobar' do
   domain_password data_bag_item('users', 'binduser')['password']
   ou "#{the_ou_string},#{the_dc_string}" # OU=Web,OU=Sydney,OU=AU,OU=Servers,DC=example,DC=com
 end
+
+# Add IT group to sudoers file
+# %example\IT ALL=(ALL) ALL
+# Requires that sudoers cookbook dependency be present in metadata.rb
+sudo '%example\\IT' do
+  user '%example\\IT'
+  runas 'ALL'
+  commands ['ALL']
+end
