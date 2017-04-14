@@ -1,3 +1,8 @@
+4.12.1
+------
+Throws error if running on chef 11 or chef 13
+Temporary fix until this issue is fixed https://github.com/NetDocuments/ad-join-cookbook/issues/23
+
 4.12.0
 ------
 Fixes issue #19
