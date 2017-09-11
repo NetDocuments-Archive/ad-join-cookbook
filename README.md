@@ -102,6 +102,12 @@ This cookbook has experimental support for joining ubuntu 16.04. Common pitfalls
 
 Set `default['ad-join']['linux']['hide_sensitive'] == false` and try again
 
+
+Unable to install packages
+If using chef 12.0 to 12.9 you will need to manually include the apt recipe in the runlist to run `apt-get update`
+If using chef 12.9 or newer, the package resource should auto detect that apt-get update hasn't run yet and run it automatically.
+
+
 ```
 realm: No such realm found
 ```
