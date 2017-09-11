@@ -117,8 +117,6 @@ action :join do
 
   when 'linux'
 
-    include_recipe 'apt::default'
-
     case node['platform_version']
     when '16.04'
         # Installation based on this document https://help.ubuntu.com/lts/serverguide/sssd-ad.html
