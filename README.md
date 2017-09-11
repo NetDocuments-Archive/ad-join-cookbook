@@ -12,42 +12,28 @@ This leverages [custom resources](https://docs.chef.io/custom_resources.html) so
 Tested on:
 
 Windows 2012R2  
-Ubuntu 16.04
+Ubuntu 16.04 (experimental)
 
-## Ubuntu 
-
-This cookbook has limited support for linux. Common pitfalls
-
-- Hostname must be 15 characters or less
-- NetBios names are not supported (Windows 2000 domain controllers )
-- Domain is cAsE SenSITive
-- If the domain join fails, the domain password may be logged on the chef server in plain text. Take caution to roll your logs if that happens.
-
-**The ad-join cookbook is as unopinionated as possible. It will not configure sudoers file or sssd.conf file. Use the sudoers or sssd cookbook in your wrapper cookbook to manage those services.**
-
-The cookbook will overwrite '/etc/krb5.conf' and '/etc/samba/smb.conf'. Best to only run this cookbook on new machines. 
-
-See troubleshooting section at bottom for additional information
 
 ## Attributes
 
     default['ad-join']['windows']['update_hostname'] = true
-    
+
 Set to false if you want the domain name/hostname to be different from the chef node name. (see [#5](https://github.com/NetDocuments/ad-join-cookbook/issues/5)).
 
     default['ad-join']['windows']['double_reboot'] = true
 
-Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windows\\chef-ad-join.txt` exists. 
+Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windows\\chef-ad-join.txt` exists.
 
     default['ad-join']['windows']['visual_warning'] = false
 
-If `visual_warning = true`, windows will display a login warning to anyone who connects via RDP to the machine before chef has finished the reboots and the converge. This will override any group policy your company might have in place for displaying custom login messages. 
+If `visual_warning = true`, windows will display a login warning to anyone who connects via RDP to the machine before chef has finished the reboots and the converge. This will override any group policy your company might have in place for displaying custom login messages.
 
 ![](http://cl.ly/3l1I1n3X0q1G/Screenshot%202016-01-21%2012.49.45.png)
 
 ## Usage
 
-This cookbook is a library cookbook and is intended to be used by your own wrapper cookbook. See the [recipes directory](./recipes) for examples. 
+This cookbook is a library cookbook and is intended to be used by your own wrapper cookbook. See the [recipes directory](./recipes) for examples.
 
 ### Actions
 
@@ -75,7 +61,7 @@ domain_join 'foobar' do
 end
 ```
 
-The ou must be formatted with `OU=` before each organizational unit and `DC=` before each domain component. see [recipes/example_complex.rb](./recipes/example_complex.rb) for an example of how to derive the OU from attributes. 
+The ou must be formatted with `OU=` before each organizational unit and `DC=` before each domain component. see [recipes/example_complex.rb](./recipes/example_complex.rb) for an example of how to derive the OU from attributes.
 
 
 ### Behind the scenes
@@ -83,21 +69,38 @@ The ou must be formatted with `OU=` before each organizational unit and `DC=` be
 If you bootstrapped the node with the name option; e.g.
 
     knife bootstrap -N us-web01
-    
+
 Then that is the name that will be used to join the domain (not the hostname since windows randomly generates it on first boot)
 
 **The name cannot include control characters, leading or trailing spaces, or any of the following characters: / \\ [ ].**
 
-In most cases, Windows hostnames must be 15 characters or less. 
+In most cases, Windows hostnames must be 15 characters or less.
 
-The cookbook creates a windows scheduled task that runs chef as soon as the VM is started. The scheduled task is deleted after all the reboots. 
+The cookbook creates a windows scheduled task that runs chef as soon as the VM is started. The scheduled task is deleted after all the reboots.
 
-The cookbook will restart windows twice since some group policy objects (like the time zone) are not applied on first boot. You can change this behavior by changing the following attribute to false. 
+The cookbook will restart windows twice since some group policy objects (like the time zone) are not applied on first boot. You can change this behavior by changing the following attribute to false.
 
     default['ad-join']['windows']['double_reboot'] = true  
 
 
+## Ubuntu
+
+This cookbook has experimental support for joining ubuntu 16.04. Common pitfalls
+
+- Ubuntu 16.04 only
+- Hostname must be 15 characters or less
+- NetBios names are not supported (Windows 2000 domain controllers )
+- Domain is cAsE SenSITive
+- Debugging can be difficult, temporarily set `default['ad-join']['linux']['hide_sensitive'] == false` to get additional information
+- :leave action not yet supported
+
+**The ad-join cookbook is as unopinionated as possible. It will not configure sudoers file. Use the sudoers cookbook in your wrapper cookbook to manage those services. See recipes/example_simple_linux.rb**
+
 ## Troubleshooting
+
+### Ubuntu
+
+Set `default['ad-join']['linux']['hide_sensitive'] == false` and try again
 
 ```
 realm: No such realm found

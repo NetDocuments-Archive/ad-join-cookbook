@@ -122,7 +122,8 @@ action :join do
     case node['platform_version']
     when '16.04'
         # Installation based on this document https://help.ubuntu.com/lts/serverguide/sssd-ad.html
-        %w(krb5-user samba sssd ntp).each do |pkg|
+        # https://tutel.me/c/unix/questions/256626/sssd+realm+discover+not+authorized+to+perform+this+action
+        %w(realmd sssd-tools sssd libnss-sss libpam-sss adcli packagekit).each do |pkg|
           package pkg do
             action :install
           end
@@ -130,10 +131,11 @@ action :join do
 
         # TODO: add or replace 'default_realm' in /etc/krb5.conf
 
+        # https://answers.launchpad.net/ubuntu/+question/293540
         execute 'realm join' do
           environment 'DOMAIN_PASS' => domain_password
           command <<-EOH
-          echo "${DOMAIN_PASS}" | sudo realm join --verbose #{new_resource.domain} --user #{domain_user}@#{new_resource.domain} --computer-ou #{ou}
+          echo "${DOMAIN_PASS}" | sudo realm join --verbose #{new_resource.domain} --user #{domain_user}@#{new_resource.domain} --computer-ou #{ou} --install=/
           EOH
           not_if <<-EOH
           domain=$(sudo realm list -n| tr '[:upper:]' '[:lower:]');
@@ -146,21 +148,18 @@ action :join do
             # echo "${domain} matches #{new_resource.domain.downcase}" >> /tmp/domain;
             exit 0;
           fi
-
           EOH
-          # sensitive true
-          # TODO: do I need to restart ohai?
+          sensitive true if node['ad-join']['linux']['hide_sensitive'] == true
         end
 
-        #TODO: sssd restart
-
-        #TODO: pam.d edit
-
-        #TODO edit lightdm.conf
-
-
-        #TODO: add to sudoers
-        # http://serverfault.com/questions/811033/sssd-allow-login-with-both-short-and-log-domain-credentials/811034#811034
+        cookbook_file '/etc/pam.d/CHEF-mkhomedir' do
+          owner 'root'
+          source "CHEF-mkhomedir.txt"
+          cookbook 'ad-join'
+          group 'root'
+          mode '0644'
+          action :create
+        end
 
     else
       Chef::Log.fatal("Only Ubuntu 16.04 currently supported. Found: #{node['platform']}")
@@ -240,7 +239,7 @@ action :leave do
     end
 
   when 'linux'
-
+    raise "Linux can't yet unjoin from domain"
 
   else
     Chef::Log.fatal("Platform: #{node['platform']} not supported")

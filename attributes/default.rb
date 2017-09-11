@@ -2,3 +2,4 @@
 default['ad-join']['windows']['update_hostname'] = true
 default['ad-join']['windows']['double_reboot'] = true
 default['ad-join']['windows']['visual_warning'] = false
+default['ad-join']['linux']['hide_sensitive'] = true
