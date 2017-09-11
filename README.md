@@ -19,10 +19,13 @@ Ubuntu 16.04
 This cookbook has limited support for linux. Common pitfalls
 
 - Hostname must be 15 characters or less
+- NetBios names are not supported (Windows 2000 domain controllers )
 - Domain is cAsE SenSITive
 - If the domain join fails, the domain password may be logged on the chef server in plain text. Take caution to roll your logs if that happens.
 
 **The ad-join cookbook is as unopinionated as possible. It will not configure sudoers file or sssd.conf file. Use the sudoers or sssd cookbook in your wrapper cookbook to manage those services.**
+
+The cookbook will overwrite '/etc/krb5.conf' and '/etc/samba/smb.conf'. Best to only run this cookbook on new machines. 
 
 See troubleshooting section at bottom for additional information
 
@@ -105,7 +108,7 @@ Realm is case sensitive. Try EXAMPLE.COM instead of example.com
 realm: Not authorized to perform this action
 ````
 
-Not all packages installed succesfully. Verify adcli and packagekit are installed
+Not all packages installed successfully. Verify adcli and packagekit are installed
 
 ```
 ! Couldn't get kerberos ticket for: foo@example.com: KDC reply did not match expectations

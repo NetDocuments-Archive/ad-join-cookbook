@@ -116,16 +116,19 @@ action :join do
     end
 
   when 'linux'
-    
+
     include_recipe 'apt::default'
 
     case node['platform_version']
     when '16.04'
-        %w(realmd sssd-tools sssd libnss-sss libpam-sss adcli packagekit).each do |pkg|
+        # Installation based on this document https://help.ubuntu.com/lts/serverguide/sssd-ad.html
+        %w(krb5-user samba sssd ntp).each do |pkg|
           package pkg do
             action :install
           end
         end
+
+        # TODO: add or replace 'default_realm' in /etc/krb5.conf
 
         execute 'realm join' do
           environment 'DOMAIN_PASS' => domain_password
@@ -134,12 +137,12 @@ action :join do
           EOH
           not_if <<-EOH
           domain=$(sudo realm list -n| tr '[:upper:]' '[:lower:]');
-          # echo domain is ${domain} > /tmp/domain; 
-          # echo "resource domain is #{new_resource.domain.downcase}" >> /tmp/domain; 
-          if [ "${domain}" != "#{new_resource.domain.downcase}" ]; then 
+          # echo domain is ${domain} > /tmp/domain;
+          # echo "resource domain is #{new_resource.domain.downcase}" >> /tmp/domain;
+          if [ "${domain}" != "#{new_resource.domain.downcase}" ]; then
             # echo "${domain} doesnt match #{new_resource.domain.downcase}" >> /tmp/domain;
             exit 1;
-          else 
+          else
             # echo "${domain} matches #{new_resource.domain.downcase}" >> /tmp/domain;
             exit 0;
           fi
@@ -149,9 +152,17 @@ action :join do
           # TODO: do I need to restart ohai?
         end
 
+        #TODO: sssd restart
+
+        #TODO: pam.d edit
+
+        #TODO edit lightdm.conf
+
+
+        #TODO: add to sudoers
         # http://serverfault.com/questions/811033/sssd-allow-login-with-both-short-and-log-domain-credentials/811034#811034
 
-    else 
+    else
       Chef::Log.fatal("Only Ubuntu 16.04 currently supported. Found: #{node['platform']}")
     end
   else
@@ -160,7 +171,7 @@ action :join do
 end
 
 action :leave do
-    
+
   reboot 'Restart Computer' do
     action :nothing
   end
@@ -229,7 +240,7 @@ action :leave do
     end
 
   when 'linux'
-    
+
 
   else
     Chef::Log.fatal("Platform: #{node['platform']} not supported")

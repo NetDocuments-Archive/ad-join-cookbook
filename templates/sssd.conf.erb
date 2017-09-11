@@ -1,0 +1,24 @@
+[sssd]
+services = nss, pam
+config_file_version = 2
+domains = MYUBUNTU.EXAMPLE.COM
+
+[domain/MYUBUNTU.EXAMPLE.COM]
+id_provider = ad
+access_provider = ad
+
+# Use this if users are being logged in at /.
+# This example specifies /home/DOMAIN-FQDN/user as $HOME.  Use with pam_mkhomedir.so
+override_homedir = /home/%d/%u
+
+# Uncomment if the client machine hostname doesn't match the computer object on the DC.
+# ad_hostname = mymachine.myubuntu.example.com
+
+# Uncomment if DNS SRV resolution is not working
+# ad_server = dc.mydomain.example.com
+
+# Uncomment if the AD domain is named differently than the Samba domain
+# ad_domain = MYUBUNTU.EXAMPLE.COM
+
+# Enumeration is discouraged for performance reasons.
+# enumerate = true
