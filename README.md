@@ -1,15 +1,22 @@
 ad-join Cookbook
 ============================
 
-This is a library cookbook that will join a  computer to a windows AD domain
-
+Library cookbook that will join a computer 
 ## Requirements
 
-Chef >= 12.5.1  
 
-This leverages [custom resources](https://docs.chef.io/custom_resources.html) so it will not work on chef versions older than 12.5.1
+|Cookbook Version|Min Chef Version|Max Chef Version|
+| --- | --- | --- |
+| 5.x | >= 12.7 | < 13 | 
+| 4.x  | >= 12.5.1 | < 13|
 
-Tested on:
+Chef 13 changes how windows scheduled tasks and reboots are handled. Currently only supports Chef 12. Pull requests welcome. 
+
+[https://github.com/NetDocuments/ad-join-cookbook/issues](https://github.com/NetDocuments/ad-join-cookbook/issues)
+
+
+## Tested OS's
+
 
 Windows 2012R2  
 Ubuntu 16.04 (experimental)
@@ -23,7 +30,7 @@ Set to false if you want the domain name/hostname to be different from the chef 
 
     default['ad-join']['windows']['double_reboot'] = true
 
-Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windows\\chef-ad-join.txt` exists.
+Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windows\\chef-ad-join.txt` exists. Useful since timezone doesn't always sync after first reboot. 
 
     default['ad-join']['windows']['visual_warning'] = false
 
@@ -64,7 +71,7 @@ end
 The ou must be formatted with `OU=` before each organizational unit and `DC=` before each domain component. see [recipes/example_complex.rb](./recipes/example_complex.rb) for an example of how to derive the OU from attributes.
 
 
-### Behind the scenes
+## Behind the scenes
 
 If you bootstrapped the node with the name option; e.g.
 
@@ -74,6 +81,9 @@ Then that is the name that will be used to join the domain (not the hostname sin
 
 **The name cannot include control characters, leading or trailing spaces, or any of the following characters: / \\ [ ].**
 
+### Windows 
+
+
 In most cases, Windows hostnames must be 15 characters or less.
 
 The cookbook creates a windows scheduled task that runs chef as soon as the VM is started. The scheduled task is deleted after all the reboots.
@@ -81,6 +91,13 @@ The cookbook creates a windows scheduled task that runs chef as soon as the VM i
 The cookbook will restart windows twice since some group policy objects (like the time zone) are not applied on first boot. You can change this behavior by changing the following attribute to false.
 
     default['ad-join']['windows']['double_reboot'] = true  
+
+This cookbook basically runs this powershell command, then reboots
+
+    $adminname = "EXAMPLE.COM\bob"
+    $password = 'correct-horse-battery-staple' | ConvertTo-SecureString -asPlainText -Force
+    $credential = New-Object System.Management.Automation.PSCredential($adminname,$password)
+    Add-computer -DomainName <EXAMPLE.COM> -OUPath <OU=FOO> -Server "<DC1.EXAMPLE.COM>'} -Credential $credential -force -Options JoinWithNewName,AccountCreate -PassThru
 
 
 ## Ubuntu
@@ -92,9 +109,14 @@ This cookbook has experimental support for joining ubuntu 16.04. Common pitfalls
 - NetBios names are not supported (Windows 2000 domain controllers )
 - Domain is cAsE SenSITive
 - Debugging can be difficult, temporarily set `default['ad-join']['linux']['hide_sensitive'] == false` to get additional information
-- :leave action not yet supported
+- `:leave` action not yet supported
 
-**The ad-join cookbook is as unopinionated as possible. It will not configure sudoers file. Use the sudoers cookbook in your wrapper cookbook to manage those services. See recipes/example_simple_linux.rb**
+**The ad-join cookbook is as unopinionated as possible. It will not configure `sudoers` file, `/etc/pam.d` or `/etc/krb5.conf` . Use the sudoers cookbook in your wrapper cookbook to manage those services. See [recipes/example\_simple\_linux.rb](./recipes/example_simple_linux.rb)**
+
+This cookbook basically runs this bash command
+
+    echo "correct-horse-battery-staple" | sudo realm join --verbose EXAMPLE.COM --user bob@EXAMPLE.COM --computer-ou OU=foobar --install=/
+
 
 ## Troubleshooting
 
@@ -111,11 +133,12 @@ If using chef 12.9 or newer, the package resource should auto detect that apt-ge
 ```
 realm: No such realm found
 ```
+
 Realm is case sensitive. Try EXAMPLE.COM instead of example.com
 
 ```
 realm: Not authorized to perform this action
-````
+```
 
 Not all packages installed successfully. Verify adcli and packagekit are installed
 

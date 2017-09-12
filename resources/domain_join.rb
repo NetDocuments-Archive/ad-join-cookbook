@@ -119,15 +119,19 @@ action :join do
 
     case node['platform_version']
     when '16.04'
-        # Installation based on this document https://help.ubuntu.com/lts/serverguide/sssd-ad.html
+
+        apt_update 'update' do
+          ignore_failure true
+          action :update
+        end
+
+        # AD Join loosely based on this document https://help.ubuntu.com/lts/serverguide/sssd-ad.html
         # https://tutel.me/c/unix/questions/256626/sssd+realm+discover+not+authorized+to+perform+this+action
         %w(realmd sssd-tools sssd libnss-sss libpam-sss adcli packagekit).each do |pkg|
           package pkg do
             action :install
           end
         end
-
-        # TODO: add or replace 'default_realm' in /etc/krb5.conf
 
         # https://answers.launchpad.net/ubuntu/+question/293540
         execute 'realm join' do
@@ -150,17 +154,8 @@ action :join do
           sensitive true if node['ad-join']['linux']['hide_sensitive'] == true
         end
 
-        cookbook_file '/etc/pam.d/CHEF-mkhomedir' do
-          owner 'root'
-          source "CHEF-mkhomedir.txt"
-          cookbook 'ad-join'
-          group 'root'
-          mode '0644'
-          action :create
-        end
-
     else
-      Chef::Log.fatal("Only Ubuntu 16.04 currently supported. Found: #{node['platform']}")
+      Chef::Log.fatal("Only Ubuntu 16.04 currently supported. Found: #{node['platform']} #{node['platform_version']}")
     end
   else
     Chef::Log.fatal("Platform: #{node['platform']} not supported")
