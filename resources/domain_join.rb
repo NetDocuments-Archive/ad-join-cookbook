@@ -120,26 +120,26 @@ action :join do
     case node['platform_version']
     when '16.04'
 
-        apt_update 'update' do
-          ignore_failure true
-          action :update
-        end
+      apt_update 'update' do
+        ignore_failure true
+        action :update
+      end
 
-        # AD Join loosely based on this document https://help.ubuntu.com/lts/serverguide/sssd-ad.html
-        # https://tutel.me/c/unix/questions/256626/sssd+realm+discover+not+authorized+to+perform+this+action
-        %w(realmd sssd-tools sssd libnss-sss libpam-sss adcli packagekit).each do |pkg|
-          package pkg do
-            action :install
-          end
+      # AD Join loosely based on this document https://help.ubuntu.com/lts/serverguide/sssd-ad.html
+      # https://tutel.me/c/unix/questions/256626/sssd+realm+discover+not+authorized+to+perform+this+action
+      %w(realmd sssd-tools sssd libnss-sss libpam-sss adcli packagekit).each do |pkg|
+        package pkg do
+          action :install
         end
+      end
 
-        # https://answers.launchpad.net/ubuntu/+question/293540
-        execute 'realm join' do
-          environment 'DOMAIN_PASS' => domain_password
-          command <<-EOH
+      # https://answers.launchpad.net/ubuntu/+question/293540
+      execute 'realm join' do
+        environment 'DOMAIN_PASS' => domain_password
+        command <<-EOH
           echo "${DOMAIN_PASS}" | sudo realm join --verbose #{new_resource.domain} --user #{domain_user}@#{new_resource.domain} --computer-ou #{ou} --install=/
           EOH
-          not_if <<-EOH
+        not_if <<-EOH
           domain=$(sudo realm list -n| tr '[:upper:]' '[:lower:]');
           # echo domain is ${domain} > /tmp/domain;
           # echo "resource domain is #{new_resource.domain.downcase}" >> /tmp/domain;
@@ -151,8 +151,8 @@ action :join do
             exit 0;
           fi
           EOH
-          sensitive true if node['ad-join']['linux']['hide_sensitive'] == true
-        end
+        sensitive true if node['ad-join']['linux']['hide_sensitive'] == true
+      end
 
     else
       Chef::Log.fatal("Only Ubuntu 16.04 currently supported. Found: #{node['platform']} #{node['platform_version']}")
@@ -163,7 +163,6 @@ action :join do
 end
 
 action :leave do
-
   reboot 'Restart Computer' do
     action :nothing
   end

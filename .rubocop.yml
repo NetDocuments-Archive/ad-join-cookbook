@@ -3,6 +3,8 @@ AllCops:
     - Rakefile
     - metadata.rb
     - test/Rakefile
+    - spec/*
+    - Vagrantfile
 
 Metrics/LineLength:
   Max: 220

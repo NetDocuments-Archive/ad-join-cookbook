@@ -10,7 +10,8 @@ Library cookbook that will join a computer
 | 5.x | >= 12.7 | < 13 | 
 | 4.x  | >= 12.5.1 | < 13|
 
-Chef 13 changes how windows scheduled tasks and reboots are handled. Currently only supports Chef 12. Pull requests welcome. 
+Chef 13 changes how windows scheduled tasks and reboots are handled.   
+Currently only supports Chef 12.
 
 [https://github.com/NetDocuments/ad-join-cookbook/issues](https://github.com/NetDocuments/ad-join-cookbook/issues)
 
@@ -18,8 +19,8 @@ Chef 13 changes how windows scheduled tasks and reboots are handled. Currently o
 ## Tested OS's
 
 
-Windows 2012R2  
-Ubuntu 16.04 (experimental)
+- Windows 2012R2  
+- Ubuntu 16.04 (experimental)
 
 
 ## Attributes
@@ -68,7 +69,7 @@ domain_join 'foobar' do
 end
 ```
 
-The ou must be formatted with `OU=` before each organizational unit and `DC=` before each domain component. see [recipes/example_complex.rb](./recipes/example_complex.rb) for an example of how to derive the OU from attributes.
+The ou must be formatted with `OU=` before each organizational unit and `DC=` before each domain component. see [recipes/example_complex_windows.rb](./recipes/example_complex_windows.rb) for an example of how to derive the OU from attributes.
 
 
 ## Behind the scenes
@@ -102,16 +103,19 @@ This cookbook basically runs this powershell command, then reboots
 
 ## Ubuntu
 
-This cookbook has experimental support for joining ubuntu 16.04. Common pitfalls
+This cookbook has experimental support for joining ubuntu 16.04.   
+It does not reboot or manage any of the additional files that might be required for a complete ad join
+
+Common pitfalls
 
 - Ubuntu 16.04 only
 - Hostname must be 15 characters or less
 - NetBios names are not supported (Windows 2000 domain controllers )
-- Domain is cAsE SenSITive
+- Domain is cAsE SenSITive. In most cases this needs to be all uppercase. 
 - Debugging can be difficult, temporarily set `default['ad-join']['linux']['hide_sensitive'] == false` to get additional information
 - `:leave` action not yet supported
 
-**The ad-join cookbook is as unopinionated as possible. It will not configure `sudoers` file, `/etc/pam.d` or `/etc/krb5.conf` . Use the sudoers cookbook in your wrapper cookbook to manage those services. See [recipes/example\_simple\_linux.rb](./recipes/example_simple_linux.rb)**
+**The ad-join cookbook is as unopinionated as possible. It will not configure `sudoers` file, `/etc/pam.d` or `/etc/krb5.conf`. Use the sudoers cookbook in your wrapper cookbook to manage those services. See [recipes/example\_simple\_linux.rb](./recipes/example_simple_linux.rb) for examples on how to manage those files**
 
 This cookbook basically runs this bash command
 
@@ -140,7 +144,7 @@ Realm is case sensitive. Try EXAMPLE.COM instead of example.com
 realm: Not authorized to perform this action
 ```
 
-Not all packages installed successfully. Verify adcli and packagekit are installed
+Not all packages installed successfully. Verify `adcli` and `packagekit` are installed
 
 ```
 ! Couldn't get kerberos ticket for: foo@example.com: KDC reply did not match expectations

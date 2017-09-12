@@ -8,7 +8,6 @@ domain_join 'foobar' do
   ou 'OU=US,OU=West,OU=Web,DC=example,DC=com'
 end
 
-
 # For linux machines, add users to sudoers file
 # Make sure sudoers cookbook is included in metadata of wrapper cookbook
 # In your role/environment/profile define your sudoers users
@@ -37,7 +36,7 @@ end
 # Itterate over all sudo users
 node['mycompany-ad-join']['sudoers'].each do |s|
   sudo s['user'] do
-    name s['name'] if s['name'] #The name of file in /etc/sudoers.d
+    name s['name'] if s['name'] # The name of file in /etc/sudoers.d
     user s['user']
     runas s['runas'] if s['runas']
     commands s['commands'] if s['commands']
@@ -46,7 +45,7 @@ end
 
 # AD users won't get a home directory created automatically unless pam_mkhomedir.so is defined
 file '/etc/pam.d/CHEF-mkhomedir' do
-  content "session required    pam_mkhomedir.so skel=/etc/skel/ umask=0022"
+  content 'session required    pam_mkhomedir.so skel=/etc/skel/ umask=0022'
   owner 'root'
   group 'root'
   mode '0644'

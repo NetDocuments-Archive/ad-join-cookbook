@@ -40,7 +40,7 @@ the_dc_string = the_dc_string.chomp(',') # Remove trailing comma
 Chef::Log.info "ad-join string is #{the_ou_string},#{the_dc_string}"
 
 domain_join 'foobar' do
-  domain node['foo']['domains'].join('.')  # example.com
+  domain node['foo']['domains'].join('.') # example.com
   domain_user 'binduser'
   domain_password data_bag_item('users', 'binduser')['password']
   ou "#{the_ou_string},#{the_dc_string}" # OU=Web,OU=Sydney,OU=AU,OU=Servers,DC=example,DC=com
