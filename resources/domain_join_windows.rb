@@ -66,7 +66,7 @@ action :join do
   windows_task 'chef ad-join' do
     task_name 'chef ad-join' # http://bit.ly/1WDZ1kn
     user 'SYSTEM'
-    command 'chef-client -L C:\chef\chef-ad-join.log'
+    command 'chef-client -L C:\chef\chef-ad-join.log --config-option exit_status :disabled'
     run_level :highest
     frequency :onstart
     only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
@@ -82,13 +82,14 @@ action :join do
     start_day '06/09/2016'
     start_time '01:00'
     only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
-    action :change
+    # Chef 12 uses :change, Chef 13.4.19 uses :create to modify existing tasks http://bit.ly/2wbDTzP
+    action :change if Gem::Requirement.create('~> 12').satisfied_by?(Gem::Version.create(Chef::VERSION))
   end
 
   powershell_script 'ad-join' do
     code <<-EOH
-    $adminname = "#{new_resource.domain}\\#{domain_user}"
-    $password = '#{domain_password}' | ConvertTo-SecureString -asPlainText -Force
+    $adminname = "#{new_resource.domain}\\#{new_resource.domain_user}"
+    $password = '#{new_resource.domain_password}' | ConvertTo-SecureString -asPlainText -Force
     $credential = New-Object System.Management.Automation.PSCredential($adminname,$password)
 
     if ( '#{newcomputername}' -eq $(hostname) ) {
@@ -99,10 +100,10 @@ action :join do
       Rename-Computer -NewName '#{newcomputername}'
     }
     sleep 5
-    Add-computer -DomainName #{new_resource.domain} #{ou.nil? ? '' : '-OUPath "' + ou + '"'} #{server.nil? ? '' : '-Server "' + server + '"'} -Credential $credential -force -Options JoinWithNewName,AccountCreate -PassThru #-Restart
+    Add-computer -DomainName #{new_resource.domain} #{new_resource.ou.nil? ? '' : '-OUPath "' + new_resource.ou + '"'} #{new_resource.server.nil? ? '' : '-Server "' + new_resource.server + '"'} -Credential $credential -force -Options JoinWithNewName,AccountCreate -PassThru #-Restart
 
     # Old way, somtimes Domain controller busy error occured
-    # Add-Computer  #{newcomputername} -DomainName #{new_resource.domain} -OUPath #{ou} -Credential $credential -Restart -PassThru
+    # Add-Computer  #{newcomputername} -DomainName #{new_resource.domain} -OUPath #{new_resource.ou} -Credential $credential -Restart -PassThru
     # Add-Computer -ComputerName Server01 -LocalCredential Server01\Admin01 -DomainName Domain02 -Credential Domain02\Admin02 -Restart -Force
     EOH
     only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
@@ -118,7 +119,8 @@ action :join do
     notifies :reboot_now, 'reboot[Restart Computer]', :immediately
   end
 
-  windows_task 'chef ad-join' do
+  windows_task 'remove chef ad-join' do
+    task_name 'chef ad-join' # http://bit.ly/1WDZ1kn
     notifies :delete, 'registry_key[warning]', :delayed
     action :delete
   end
@@ -170,8 +172,8 @@ action :leave do
 
   powershell_script 'ad-join-leave' do
     code <<-EOH
-    $adminname = "#{domain}\\#{domain_user}"
-    $password = '#{domain_password}' | ConvertTo-SecureString -asPlainText -Force
+    $adminname = "#{new_resource.domain}\\#{new_resource.domain_user}"
+    $password = '#{new_resource.domain_password}' | ConvertTo-SecureString -asPlainText -Force
     $credential = New-Object System.Management.Automation.PSCredential($adminname,$password)
 
     Remove-Computer -UnjoinDomainCredential $credential -Force -PassThru
