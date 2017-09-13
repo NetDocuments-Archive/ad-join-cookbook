@@ -5,17 +5,6 @@ Library cookbook that will join a computer
 ## Requirements
 
 
-|Cookbook Version|Min Chef Version|Max Chef Version|
-| --- | --- | --- |
-| 5.x | >= 12.7 | < 13 |
-| 4.x  | >= 12.5.1 | < 13|
-
-Chef 13 changes how windows scheduled tasks and reboots are handled.   
-Currently only supports Chef 12.
-
-[https://github.com/NetDocuments/ad-join-cookbook/issues](https://github.com/NetDocuments/ad-join-cookbook/issues)
-
-
 ## Tested OS's
 
 - Windows 2012R2  
