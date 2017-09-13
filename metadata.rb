@@ -11,6 +11,7 @@ version          '4.12.1'
 depends 'windows', '>= 1.36.0'
 
 supports 'windows'
+supports 'ubuntu'
 
 # linux support requires apt_update resource introduced in chef 12.7
 # Chef 13 has many changes to windows scheduled tasks and reboots https://github.com/NetDocuments/ad-join-cookbook/issues

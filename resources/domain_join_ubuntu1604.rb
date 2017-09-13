@@ -53,5 +53,19 @@ action :join do
 end
 
 action :leave do
-  raise "Linux can't yet unjoin from domain"
+  execute 'realm leave' do
+    environment 'DOMAIN_PASS' => domain_password
+    command <<-EOH
+      sudo realm leave
+      EOH
+    only_if <<-EOH
+      domain=$(sudo realm list -n| tr '[:upper:]' '[:lower:]');
+      if [ "${domain}" != "#{new_resource.domain.downcase}" ]; then
+        exit 1;
+      else
+        exit 0;
+      fi
+      EOH
+    sensitive new_resource.hide_sensitive
+  end
 end

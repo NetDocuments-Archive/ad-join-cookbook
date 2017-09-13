@@ -20,6 +20,7 @@ Currently only supports Chef 12.
 
 
 - Windows 2012R2  
+- Ubuntu 14.04 (experimental)
 - Ubuntu 16.04 (experimental)
 
 ## Usage
@@ -31,17 +32,17 @@ This cookbook is a library cookbook and is intended to be used by your own wrapp
 - join
 - leave
 
-It contains a custom resource named `domain_join` that takes 5 properties
+It contains a custom resource named `domain_join` with the following properties
 
 - domain
 - domain_user
 - domain_password
 - ou
 - server (optional)
-- update_hostname (windows only, Set to false if you want the domain name/hostname to be different from the chef node name. (see [#5](https://github.com/NetDocuments/ad-join-cookbook/issues/5)).)
-- double_reboot (windows only, Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windows\\chef-ad-join.txt` exists. Useful since timezone doesn't always sync after first reboot. )
-- visual_warning true (windows only, display a login warning to anyone who connects via RDP to the machine before chef has finished the reboots and the converge. This will override any group policy your company might have in place for displaying custom login messages.)
-- hide_sensitive (linux only, hide password used in realmd command, set to true for debugging)
+- update_hostname (optional, windows only, Set to false if you want the domain name/hostname to be different from the chef node name. (see [#5](https://github.com/NetDocuments/ad-join-cookbook/issues/5)).)
+- double_reboot (optional, windows only, Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windows\\chef-ad-join.txt` exists. Useful since timezone doesn't always sync after first reboot. )
+- visual_warning true (optional, windows only, display a login warning to anyone who connects via RDP to the machine before chef has finished the reboots and the converge. This will override any group policy your company might have in place for displaying custom login messages.)
+- hide_sensitive (optional, linux only, hide password used in realmd command, set to false for debugging)
 
 example:  
 
@@ -108,8 +109,7 @@ Common pitfalls
 - Hostnames longer than 15 characters will be truncated
 - NetBios names are not supported (Windows 2000 domain controllers )
 - Domain is cAsE SenSITive. In most cases this needs to be all uppercase.
-- Debugging can be difficult, temporarily set `'hide_sensitive' true` to get additional information
-- `:leave` action not yet supported
+- Debugging can be difficult, temporarily set `'hide_sensitive' false` to get additional information
 
 **The ad-join cookbook is as unopinionated as possible. It will not configure `sudoers` file, `/etc/pam.d` or `/etc/krb5.conf`. Use the sudoers cookbook in your wrapper cookbook to manage those services. See [recipes/example\_simple\_linux.rb](./recipes/example_simple_linux.rb) for examples on how to manage those files**
 
