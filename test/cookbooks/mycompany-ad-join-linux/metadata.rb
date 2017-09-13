@@ -1,4 +1,4 @@
-name 'mycompany-ad-join-windows'
+name 'mycompany-ad-join-linux'
 maintainer 'NetDocuments'
 maintainer_email 'user@example.com'
 license 'All rights reserved'
