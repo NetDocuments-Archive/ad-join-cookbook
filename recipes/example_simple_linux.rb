@@ -14,6 +14,10 @@ end
 
 # {
 #   "mycompnay-ad-join": {
+#     "kerberos_realm": [
+#        "EXAMPLE",
+#        "COM"
+#     ],
 #     "sudoers": [{
 #       "name": "IT",
 #       "user": "%exampleco\\\\IT",
@@ -52,19 +56,19 @@ file '/etc/pam.d/CHEF-mkhomedir' do
   action :create
 end
 
-# If you have one way trusts between multiple domains, you can only login if you specify the root domain (e.g user@CORP.EXAMPLE.COM)
-# user@CORP.EXAMPLE.COM
-# user@LAB.EXAMPLE.COM
-# By changing default_realm you make it so users don't have to remember type in the full domain when logging in to other trusted domains
-file '/etc/krb5.conf' do
-  content <<-EOH
-[libdefaults]
-default_realm CORP.EXAMPLE.COM
-ticket_lifetime = 24h
-renew_lifetime = 7d
-  EOH
-  owner 'root'
-  group 'root'
-  mode '0644'
-  action :create
+ruby_block 'desc' do
+  block do
+    file = Chef::Util::FileEdit.new("/etc/sssd/sssd.conf")
+    file.insert_line_if_no_match('dyndns_update*', 'dyndns_update = true')
+    file.insert_line_if_no_match('dyndns_refresh_interval*', 'dyndns_refresh_interval = 43200')
+    file.insert_line_if_no_match('dyndns_update_ptr*', 'dyndns_update_ptr = true')
+    file.insert_line_if_no_match('dyndns_ttl*', 'dyndns_ttl = 3600')
+    file.write_file
+  end
+  notifies :restart, 'service[sssd]', :immediately
+  only_if { node['os'] == 'linux' }
+end
+
+service 'sssd' do
+  action [:nothing]
 end

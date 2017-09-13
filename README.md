@@ -1,13 +1,13 @@
 ad-join Cookbook
 ============================
 
-Library cookbook that will join a computer 
+Library cookbook that will join a computer
 ## Requirements
 
 
 |Cookbook Version|Min Chef Version|Max Chef Version|
 | --- | --- | --- |
-| 5.x | >= 12.7 | < 13 | 
+| 5.x | >= 12.7 | < 13 |
 | 4.x  | >= 12.5.1 | < 13|
 
 Chef 13 changes how windows scheduled tasks and reboots are handled.   
@@ -31,7 +31,7 @@ Set to false if you want the domain name/hostname to be different from the chef 
 
     default['ad-join']['windows']['double_reboot'] = true
 
-Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windows\\chef-ad-join.txt` exists. Useful since timezone doesn't always sync after first reboot. 
+Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windows\\chef-ad-join.txt` exists. Useful since timezone doesn't always sync after first reboot.
 
     default['ad-join']['windows']['visual_warning'] = false
 
@@ -55,6 +55,10 @@ It contains a custom resource named `domain_join` that takes 5 properties
 - domain_password
 - ou
 - server (optional)
+- update_hostname (windows only, renames host to chef name)
+- double_reboot (windows only, reboots system twice. If AD GPO Object sets timezone, it wont apply on first boot. )
+- visual_warning true (windows only, warns on login screen that machine is about to reboot)
+- hide_sensitive (linux only, hide password used in realmd command, set to true for debugging)
 
 example:  
 
@@ -65,6 +69,10 @@ domain_join 'foobar' do
   domain_password 'correct-horse-battery-staple'
   ou              'OU=US,OU=West,OU=Web,DC=example,DC=com'
   server          'DC01' #Optional
+  update_hostname true
+  double_reboot true
+  visual_warning true
+  hide_sensitive false
   action :join
 end
 ```
@@ -82,7 +90,7 @@ Then that is the name that will be used to join the domain (not the hostname sin
 
 **The name cannot include control characters, leading or trailing spaces, or any of the following characters: / \\ [ ].**
 
-### Windows 
+### Windows
 
 
 In most cases, Windows hostnames must be 15 characters or less.
@@ -109,9 +117,9 @@ It does not reboot or manage any of the additional files that might be required 
 Common pitfalls
 
 - Ubuntu 16.04 only
-- Hostname must be 15 characters or less
+- Hostnames longer than 15 characters will be truncated
 - NetBios names are not supported (Windows 2000 domain controllers )
-- Domain is cAsE SenSITive. In most cases this needs to be all uppercase. 
+- Domain is cAsE SenSITive. In most cases this needs to be all uppercase.
 - Debugging can be difficult, temporarily set `default['ad-join']['linux']['hide_sensitive'] == false` to get additional information
 - `:leave` action not yet supported
 

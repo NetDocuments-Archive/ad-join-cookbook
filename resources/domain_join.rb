@@ -4,8 +4,16 @@ property :domain_user, String, required: true
 property :domain_password, String, required: true
 property :ou, [String, NilClass], required: false, default: nil
 property :server, [String, NilClass], required: false, default: nil
+property :update_hostname, [TrueClass, FalseClass], required: false, default: true
+property :double_reboot, [TrueClass, FalseClass], required: false, default: true
+property :visual_warning, [TrueClass, FalseClass], required: false, default: true
+property :hide_sensitive, [TrueClass, FalseClass], required: false, default: true
 
 default_action :join
+
+Chef::Log.warn( "node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['update_hostname'])
+Chef::Log.warn( "node['ad-join']['windows']['visual_warning'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
+Chef::Log.warn( "node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
 
 # ohai domain attributes
 # node['kernel']['cs_info']['domain_role']
@@ -19,9 +27,9 @@ default_action :join
 
 action :join do
   # Set the computer name to the same name provided by -N parameter in  knife boostrap -N 'node01'
-  if Chef::Config[:node_name] != node['hostname'] && Chef::Config[:node_name] != node['fqdn'] && node['ad-join']['windows']['update_hostname'] == true
+  if Chef::Config[:node_name] != node['hostname'] && Chef::Config[:node_name] != node['fqdn'] && update_hostname == true
     # Abort if hostname is more than 15 characters long on windows
-    raise if node['os'] == 'windows' && Chef::Config[:node_name].length > 15
+    raise if Chef::Config[:node_name].length > 15
 
     newcomputername = Chef::Config[:node_name]
     # renew info about nodename on chef server after reload
@@ -50,7 +58,7 @@ action :join do
         { name: 'legalnoticecaption', type: :string, data: warning_caption },
         { name: 'legalnoticetext', type: :string, data: warning_text }
       ]
-      only_if { node['ad-join']['windows']['visual_warning'] == true }
+      only_if { visual_warning == true }
       action :nothing
     end
 
@@ -106,7 +114,7 @@ action :join do
     file 'c:/Windows/chef-ad-join.txt' do
       content 'Placed by ad-join cookbook. Cookbook will keep rebooting windows until server is part of a domain and this file exists. DONT DELETE'
       action :create_if_missing
-      only_if { node['ad-join']['windows']['double_reboot'] == true }
+      only_if { double_reboot == true }
       notifies :reboot_now, 'reboot[Restart Computer]', :immediately
     end
 
@@ -120,6 +128,7 @@ action :join do
     case node['platform_version']
     when '16.04'
 
+      #TODO: don't run every time, just first time
       apt_update 'update' do
         ignore_failure true
         action :update
@@ -151,7 +160,7 @@ action :join do
             exit 0;
           fi
           EOH
-        sensitive true if node['ad-join']['linux']['hide_sensitive'] == true
+        sensitive true if hide_sensitive == true
       end
 
     else
