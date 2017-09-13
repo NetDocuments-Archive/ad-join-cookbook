@@ -26,7 +26,7 @@ Chef::Log.info "ad-join string is #{the_ou_string},#{the_dc_string}"
 domain_join 'foobar' do
   domain           dc_domains.join('.').to_s
   domain_user      data_bag_item('users', 'ad-user')['username']
-  domain_password  data_bag_item('users', 'ad-user')['password'] #'correct-horse-battery-staple'
+  domain_password  data_bag_item('users', 'ad-user')['password'] # 'correct-horse-battery-staple'
   ou               "#{the_ou_string},#{the_dc_string}" # 'OU=US,OU=West,OU=Web,DC=example,DC=com'
   server           'domaincontroller1.example.com'
   update_hostname true
