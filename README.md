@@ -41,7 +41,7 @@ It contains a custom resource named `domain_join` that takes 5 properties
 - update_hostname (windows only, Set to false if you want the domain name/hostname to be different from the chef node name. (see [#5](https://github.com/NetDocuments/ad-join-cookbook/issues/5)).)
 - double_reboot (windows only, Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windows\\chef-ad-join.txt` exists. Useful since timezone doesn't always sync after first reboot. )
 - visual_warning true (windows only, display a login warning to anyone who connects via RDP to the machine before chef has finished the reboots and the converge. This will override any group policy your company might have in place for displaying custom login messages.)
-- hide_sensitive (linux only, hide password used in realmd command, set to true for debugging)
+- sensitive (linux only, hide password used in realmd command, set to true for debugging)
 
 example:  
 
@@ -55,7 +55,7 @@ domain_join 'foobar' do
   update_hostname true
   double_reboot true
   visual_warning true
-  hide_sensitive false
+  sensitive true
   action :join
 end
 ```
