@@ -1,11 +1,28 @@
+inherit_from: .rubocop_todo.yml
+
 AllCops:
   Exclude:
     - Rakefile
     - metadata.rb
     - test/Rakefile
+    - test/spec/spec_helper.rb
+    - spec/*
+    - Vagrantfile
 
 Metrics/LineLength:
-  Max: 220
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
 
 Lint/ParenthesesAsGroupedExpression:
+  Enabled: false
+
+Style/VariableName:
+  Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false
+
+Style/DoubleNegation:
   Enabled: false
