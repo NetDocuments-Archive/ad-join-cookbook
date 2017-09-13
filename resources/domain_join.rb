@@ -131,7 +131,7 @@ action :join do
       #TODO: don't run every time, just first time
       apt_update 'update' do
         ignore_failure true
-        action :update
+        action :nothing
       end
 
       # AD Join loosely based on this document https://help.ubuntu.com/lts/serverguide/sssd-ad.html
@@ -139,6 +139,7 @@ action :join do
       %w(realmd sssd-tools sssd libnss-sss libpam-sss adcli packagekit).each do |pkg|
         package pkg do
           action :install
+          notifies :update, 'apt_update[update]', :before
         end
       end
 

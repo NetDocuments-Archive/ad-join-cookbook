@@ -22,23 +22,6 @@ Currently only supports Chef 12.
 - Windows 2012R2  
 - Ubuntu 16.04 (experimental)
 
-
-## Attributes
-
-    default['ad-join']['windows']['update_hostname'] = true
-
-Set to false if you want the domain name/hostname to be different from the chef node name. (see [#5](https://github.com/NetDocuments/ad-join-cookbook/issues/5)).
-
-    default['ad-join']['windows']['double_reboot'] = true
-
-Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windows\\chef-ad-join.txt` exists. Useful since timezone doesn't always sync after first reboot.
-
-    default['ad-join']['windows']['visual_warning'] = false
-
-If `visual_warning = true`, windows will display a login warning to anyone who connects via RDP to the machine before chef has finished the reboots and the converge. This will override any group policy your company might have in place for displaying custom login messages.
-
-![](http://cl.ly/3l1I1n3X0q1G/Screenshot%202016-01-21%2012.49.45.png)
-
 ## Usage
 
 This cookbook is a library cookbook and is intended to be used by your own wrapper cookbook. See the [recipes directory](./recipes) for examples.
@@ -55,9 +38,9 @@ It contains a custom resource named `domain_join` that takes 5 properties
 - domain_password
 - ou
 - server (optional)
-- update_hostname (windows only, renames host to chef name)
-- double_reboot (windows only, reboots system twice. If AD GPO Object sets timezone, it wont apply on first boot. )
-- visual_warning true (windows only, warns on login screen that machine is about to reboot)
+- update_hostname (windows only, Set to false if you want the domain name/hostname to be different from the chef node name. (see [#5](https://github.com/NetDocuments/ad-join-cookbook/issues/5)).)
+- double_reboot (windows only, Will continue to reboot windows until joined to domain and breadcrumb `c:\\Windows\\chef-ad-join.txt` exists. Useful since timezone doesn't always sync after first reboot. )
+- visual_warning true (windows only, display a login warning to anyone who connects via RDP to the machine before chef has finished the reboots and the converge. This will override any group policy your company might have in place for displaying custom login messages.)
 - hide_sensitive (linux only, hide password used in realmd command, set to true for debugging)
 
 example:  
@@ -76,6 +59,11 @@ domain_join 'foobar' do
   action :join
 end
 ```
+
+visual_warning
+
+![](http://cl.ly/3l1I1n3X0q1G/Screenshot%202016-01-21%2012.49.45.png)
+
 
 The ou must be formatted with `OU=` before each organizational unit and `DC=` before each domain component. see [recipes/example_complex_windows.rb](./recipes/example_complex_windows.rb) for an example of how to derive the OU from attributes.
 
@@ -103,7 +91,7 @@ The cookbook will restart windows twice since some group policy objects (like th
 
 This cookbook basically runs this powershell command, then reboots
 
-    $adminname = "EXAMPLE.COM\bob"
+    $adminname = "EXAMPLE.COM\\bob"
     $password = 'correct-horse-battery-staple' | ConvertTo-SecureString -asPlainText -Force
     $credential = New-Object System.Management.Automation.PSCredential($adminname,$password)
     Add-computer -DomainName <EXAMPLE.COM> -OUPath <OU=FOO> -Server "<DC1.EXAMPLE.COM>'} -Credential $credential -force -Options JoinWithNewName,AccountCreate -PassThru
@@ -120,7 +108,7 @@ Common pitfalls
 - Hostnames longer than 15 characters will be truncated
 - NetBios names are not supported (Windows 2000 domain controllers )
 - Domain is cAsE SenSITive. In most cases this needs to be all uppercase.
-- Debugging can be difficult, temporarily set `default['ad-join']['linux']['hide_sensitive'] == false` to get additional information
+- Debugging can be difficult, temporarily set `'hide_sensitive' true` to get additional information
 - `:leave` action not yet supported
 
 **The ad-join cookbook is as unopinionated as possible. It will not configure `sudoers` file, `/etc/pam.d` or `/etc/krb5.conf`. Use the sudoers cookbook in your wrapper cookbook to manage those services. See [recipes/example\_simple\_linux.rb](./recipes/example_simple_linux.rb) for examples on how to manage those files**
@@ -133,9 +121,6 @@ This cookbook basically runs this bash command
 ## Troubleshooting
 
 ### Ubuntu
-
-Set `default['ad-join']['linux']['hide_sensitive'] == false` and try again
-
 
 Unable to install packages
 If using chef 12.0 to 12.9 you will need to manually include the apt recipe in the runlist to run `apt-get update`
