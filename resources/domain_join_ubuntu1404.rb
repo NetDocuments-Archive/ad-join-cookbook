@@ -10,11 +10,11 @@ property :visual_warning, [true, false, NilClass], required: false, default: nil
 property :hide_sensitive, [true, false], required: false, default: true
 
 default_action :join
-provides :domain_join, platform: 'ubuntu', platform_version: '14.04'
+provides :domain_join, platform_version: '14.04', platform: 'ubuntu'
 
-Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['update_hostname'])
-Chef::Log.warn("node['ad-join']['windows']['visual_warning'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
-Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
+Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if defined? node['ad-join']['windows']['update_hostname']
+Chef::Log.warn("node['ad-join']['windows']['visual_warning'] deprecated") if defined? node['ad-join']['windows']['visual_warning']
+Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if defined? node['ad-join']['windows']['visual_warning']
 
 action :join do
   apt_update 'update' do

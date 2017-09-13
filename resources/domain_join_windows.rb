@@ -13,9 +13,9 @@ default_action :join
 provides :domain_join, os: 'windows'
 #TODO: limit to just windows 2012r2
 
-Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['update_hostname'])
-Chef::Log.warn("node['ad-join']['windows']['visual_warning'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
-Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
+Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if defined? node['ad-join']['windows']['update_hostname']
+Chef::Log.warn("node['ad-join']['windows']['visual_warning'] deprecated") if defined? node['ad-join']['windows']['visual_warning']
+Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if defined? node['ad-join']['windows']['visual_warning']
 
 # ohai domain attributes
 # node['kernel']['cs_info']['domain_role']

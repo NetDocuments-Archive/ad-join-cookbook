@@ -10,11 +10,15 @@ property :visual_warning, [true, false, NilClass], required: false, default: nil
 property :hide_sensitive, [true, false], required: false, default: true
 
 default_action :join
-provides :domain_join, platform: 'ubuntu', platform_version: '16.04'
+provides :domain_join, platform_version: '16.04', platform: 'ubuntu'
 
-Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['update_hostname'])
-Chef::Log.warn("node['ad-join']['windows']['visual_warning'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
-Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
+Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if defined? node['ad-join']['windows']['update_hostname']
+Chef::Log.warn("node['ad-join']['windows']['visual_warning'] deprecated") if defined? node['ad-join']['windows']['visual_warning']
+Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if defined? node['ad-join']['windows']['visual_warning']
+
+# raise "Cookbook not compatible with Chef 13.0.0 - 13.3.0 Upgrade to >=13.4.0 or downgrade to >= 12.7.0" unless Gem::Requirement.create('>= 13.3.0').satisfied_by?(Gem::Version.create(Chef::VERSION))
+# raise "Cookbook not compatible with Chef 13.0.0 - 13.3.0 Upgrade to >=13.4.0 or downgrade to >= 12.7.0" unless Gem::Requirement.create('>= 12.7.0').satisfied_by?(Gem::Version.create(Chef::VERSION))
+
 
 action :join do
   apt_update 'update' do
