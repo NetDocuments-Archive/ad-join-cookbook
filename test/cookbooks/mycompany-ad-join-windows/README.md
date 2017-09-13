@@ -1,0 +1,1 @@
+# mycompany-ad-join-windows

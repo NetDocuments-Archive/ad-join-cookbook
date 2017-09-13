@@ -18,14 +18,14 @@ Currently only supports Chef 12.
 
 ## Tested OS's
 
-
 - Windows 2012R2  
 - Ubuntu 14.04 (experimental)
 - Ubuntu 16.04 (experimental)
 
 ## Usage
 
-This cookbook is a library cookbook and is intended to be used by your own wrapper cookbook. See the [recipes directory](./recipes) for examples.
+This cookbook is a library cookbook and is intended to be used by your own wrapper cookbook. See the [test/cookbooks directory](./test/cookbooks) for examples.
+While the examples show running a separate cookbook for windows and linux, this isn't required. It is possible for one wrapper cookbook to manage both windows and linux hosts.
 
 ### Actions
 
@@ -66,7 +66,7 @@ visual_warning
 ![](http://cl.ly/3l1I1n3X0q1G/Screenshot%202016-01-21%2012.49.45.png)
 
 
-The ou must be formatted with `OU=` before each organizational unit and `DC=` before each domain component. see [recipes/example_complex_windows.rb](./recipes/example_complex_windows.rb) for an example of how to derive the OU from attributes.
+The ou must be formatted with `OU=` before each organizational unit and `DC=` before each domain component. see [test/cookbooks directory](./test/cookbooks) for an example of how to derive the OU from attributes.
 
 
 ## Behind the scenes
@@ -111,7 +111,7 @@ Common pitfalls
 - Domain is cAsE SenSITive. In most cases this needs to be all uppercase.
 - Debugging can be difficult, temporarily set `'hide_sensitive' false` to get additional information
 
-**The ad-join cookbook is as unopinionated as possible. It will not configure `sudoers` file, `/etc/pam.d` or `/etc/krb5.conf`. Use the sudoers cookbook in your wrapper cookbook to manage those services. See [recipes/example\_simple\_linux.rb](./recipes/example_simple_linux.rb) for examples on how to manage those files**
+**The ad-join cookbook is as unopinionated as possible. It will not configure `sudoers` file, `/etc/pam.d` or `/etc/krb5.conf`. Use the sudoers cookbook in your wrapper cookbook to manage those services. See [test/cookbooks/ad-join-linux directory](./test/cookbooks/ad-join-linux) for examples on how to manage those files**
 
 This cookbook basically runs this bash command
 
