@@ -10,8 +10,7 @@ property :visual_warning, [true, false, NilClass], required: false, default: nil
 property :hide_sensitive, [true, false], required: false, default: true
 
 default_action :join
-provides :domain_join, os: 'linux'
-
+provides :domain_join, platform: 'ubuntu', platform_version: '16.04'
 
 Chef::Log.warn( "node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['update_hostname'])
 Chef::Log.warn( "node['ad-join']['windows']['visual_warning'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
@@ -22,7 +21,7 @@ action :join do
 
   apt_update 'update' do
     ignore_failure true
-    action :nothing
+    action :update
   end
 
   # AD Join loosely based on this document https://help.ubuntu.com/lts/serverguide/sssd-ad.html
@@ -30,7 +29,6 @@ action :join do
   %w(realmd sssd-tools sssd libnss-sss libpam-sss adcli packagekit).each do |pkg|
     package pkg do
       action :install
-      notifies :update, 'apt_update[update]', :before
     end
   end
 
@@ -52,7 +50,7 @@ action :join do
         exit 0;
       fi
       EOH
-    sensitive new_resource.sensitive
+    sensitive new_resource.hide_sensitive
   end
 
 end
