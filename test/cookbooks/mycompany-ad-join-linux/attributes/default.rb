@@ -1,6 +1,6 @@
 default['mycompany-ad-join'] = {
   'dc-domains' => [
-    'example'
+    'example',
     'com'
   ],
   'ou-site' => 'mySite',

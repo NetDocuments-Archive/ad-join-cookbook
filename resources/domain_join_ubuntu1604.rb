@@ -16,9 +16,6 @@ Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if de
 Chef::Log.warn("node['ad-join']['windows']['visual_warning'] deprecated") if defined? node['ad-join']['windows']['visual_warning']
 Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if defined? node['ad-join']['windows']['visual_warning']
 
-# raise "Cookbook not compatible with Chef 13.0.0 - 13.3.0 Upgrade to >=13.4.0 or downgrade to >= 12.7.0" unless Gem::Requirement.create('>= 13.3.0').satisfied_by?(Gem::Version.create(Chef::VERSION))
-# raise "Cookbook not compatible with Chef 13.0.0 - 13.3.0 Upgrade to >=13.4.0 or downgrade to >= 12.7.0" unless Gem::Requirement.create('>= 12.7.0').satisfied_by?(Gem::Version.create(Chef::VERSION))
-
 action :join do
   apt_update 'update' do
     ignore_failure true
