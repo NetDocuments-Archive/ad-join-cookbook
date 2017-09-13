@@ -22,15 +22,14 @@ action :join do
 
   apt_update 'update' do
     ignore_failure true
-    action :nothing
+    action :update
   end
 
   # AD Join loosely based on this document https://help.ubuntu.com/lts/serverguide/sssd-ad.html
   # https://tutel.me/c/unix/questions/256626/sssd+realm+discover+not+authorized+to+perform+this+action
-  %w(realmd sssd-tools sssd libnss-sss libpam-sss adcli packagekit).each do |pkg|
+  %w(realmd sssd-tools sssd libnss-sss libpam-sss adcli packagekit samba-client samba-dsdb-modules).each do |pkg|
     package pkg do
       action :install
-      notifies :update, 'apt_update[update]', :before
     end
   end
 
@@ -52,7 +51,7 @@ action :join do
         exit 0;
       fi
       EOH
-    sensitive new_resource.sensitive
+    sensitive hide_sensitive
   end
 
 end

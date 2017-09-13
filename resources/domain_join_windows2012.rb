@@ -7,7 +7,7 @@ property :server, [String, NilClass], required: false, default: nil
 property :update_hostname, [true, false], required: false, default: true
 property :double_reboot, [true, false], required: false, default: true
 property :visual_warning, [true, false], required: false, default: true
-property :sensitive, [true, false], required: false, default: true
+property :hide_sensitive, [true, false, NilClass], required: false, default: nil
 
 default_action :join
 provides :domain_join, os: 'windows'
@@ -28,7 +28,7 @@ Chef::Log.warn( "node['ad-join']['windows']['update_hostname'] deprecated") if !
 
 action :join do
   # Set the computer name to the same name provided by -N parameter in  knife boostrap -N 'node01'
-  if Chef::Config[:node_name] != node['hostname'] && Chef::Config[:node_name] != node['fqdn'] && update_hostname == true
+  if Chef::Config[:node_name] != node['hostname'] && Chef::Config[:node_name] != node['fqdn'] && new_resource.update_hostname == true
     # Abort if hostname is more than 15 characters long on windows
     raise if Chef::Config[:node_name].length > 15
 
@@ -57,7 +57,7 @@ action :join do
       { name: 'legalnoticecaption', type: :string, data: warning_caption },
       { name: 'legalnoticetext', type: :string, data: warning_text }
     ]
-    only_if { visual_warning == true }
+    only_if { new_resource.visual_warning == true }
     action :nothing
   end
 
@@ -142,7 +142,7 @@ action :leave do
       { name: 'legalnoticecaption', type: :string, data: warning_caption },
       { name: 'legalnoticetext', type: :string, data: warning_text }
     ]
-    only_if { node['ad-join']['windows']['visual_warning'] == true }
+    only_if { new_resource.visual_warning == true }
     action :nothing
   end
 
