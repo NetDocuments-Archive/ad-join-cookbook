@@ -12,9 +12,9 @@ property :hide_sensitive, [true, false, NilClass], required: false, default: nil
 default_action :join
 provides :domain_join, os: 'windows'
 
-Chef::Log.warn( "node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['update_hostname'])
-Chef::Log.warn( "node['ad-join']['windows']['visual_warning'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
-Chef::Log.warn( "node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
+Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['update_hostname'])
+Chef::Log.warn("node['ad-join']['windows']['visual_warning'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
+Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
 
 # ohai domain attributes
 # node['kernel']['cs_info']['domain_role']
@@ -121,11 +121,9 @@ action :join do
     notifies :delete, 'registry_key[warning]', :delayed
     action :delete
   end
-
 end
 
 action :leave do
-
   reboot 'Restart Computer' do
     action :nothing
   end
@@ -190,5 +188,4 @@ action :leave do
     notifies :delete, 'registry_key[warning]', :delayed
     action :delete
   end
-
 end

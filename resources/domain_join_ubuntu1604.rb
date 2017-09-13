@@ -12,13 +12,11 @@ property :hide_sensitive, [true, false], required: false, default: true
 default_action :join
 provides :domain_join, platform: 'ubuntu', platform_version: '16.04'
 
-Chef::Log.warn( "node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['update_hostname'])
-Chef::Log.warn( "node['ad-join']['windows']['visual_warning'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
-Chef::Log.warn( "node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
-
+Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['update_hostname'])
+Chef::Log.warn("node['ad-join']['windows']['visual_warning'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
+Chef::Log.warn("node['ad-join']['windows']['update_hostname'] deprecated") if !!(node['ad-join']['windows']['visual_warning'])
 
 action :join do
-
   apt_update 'update' do
     ignore_failure true
     action :update
@@ -52,7 +50,6 @@ action :join do
       EOH
     sensitive new_resource.hide_sensitive
   end
-
 end
 
 action :leave do

@@ -58,7 +58,7 @@ end
 
 ruby_block 'desc' do
   block do
-    file = Chef::Util::FileEdit.new("/etc/sssd/sssd.conf")
+    file = Chef::Util::FileEdit.new('/etc/sssd/sssd.conf')
     file.insert_line_if_no_match('dyndns_update*', 'dyndns_update = true')
     file.insert_line_if_no_match('dyndns_refresh_interval*', 'dyndns_refresh_interval = 43200')
     file.insert_line_if_no_match('dyndns_update_ptr*', 'dyndns_update_ptr = true')
