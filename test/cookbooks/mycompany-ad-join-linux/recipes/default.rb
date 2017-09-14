@@ -63,6 +63,7 @@ end
 
 package 'krb5-kdc-ldap' do
   action :install
+  only_if { node['os'] == 'linux' }
 end
 
 # Setting the default realm required on some OS's for dns updating

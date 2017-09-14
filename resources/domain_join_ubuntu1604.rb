@@ -34,7 +34,7 @@ action :join do
   execute 'realm join' do
     environment 'DOMAIN_PASS' => domain_password
     command <<-EOH
-      echo "${DOMAIN_PASS}" | sudo realm join --verbose #{new_resource.domain} --user #{domain_user}@#{new_resource.domain} --computer-ou #{ou} --install=/
+      echo "${DOMAIN_PASS}" | sudo realm join --verbose #{new_resource.domain} --user #{new_resource.domain_user}@#{new_resource.domain} --computer-ou #{new_resource.ou} --install=/
       EOH
     not_if <<-EOH
       domain=$(sudo realm list -n| tr '[:upper:]' '[:lower:]');

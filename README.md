@@ -1,8 +1,7 @@
 ad-join Cookbook
 ============================
 
-Library cookbook that will join a computer
-## Requirements
+Library cookbook that will join an Active Directory domain
 
 
 ## Tested OS's
@@ -11,10 +10,26 @@ Library cookbook that will join a computer
 - Ubuntu 14.04 (experimental)
 - Ubuntu 16.04 (experimental)
 
+
 ## Usage
 
 This cookbook is a library cookbook and is intended to be used by your own wrapper cookbook. See the [test/cookbooks directory](./test/cookbooks) for examples.
-While the examples show running a separate cookbook for windows and linux, this isn't required. It is possible for one wrapper cookbook to manage both windows and linux hosts.
+While the examples show running separate cookbooks for windows and linux, this isn't required. It is possible for one wrapper cookbook to manage both windows and linux hosts.
+
+## Windows Reboots in Chef 13
+
+This cookbook will reboot windows machines one or more times.
+
+Chef 12 returns exit code `0` when a machine reboots mid chef run  
+Chef 13 returns exit code `-35` when a windows machine reboots mid chef run  
+
+Test kitchen and knife will consider exit code `-35` an error (it's not). You must take one or more of the following precautions
+
+- Account for exit code `-35` in knife / scripts
+- Add `exit_status :disabled` to client.rb
+
+Unfortunately this creates a chicken and egg situation. **There is currently no way to set `exit_status :disabled` on bootstrap without a custom bootstrap template**. Custom bootstrap templates for windows are not well documented, so you are best off just expecting an exit code of `-35` on your first chef run. See [issue#12 for additional information](https://github.com/NetDocuments/ad-join-cookbook/issues/12)
+
 
 ### Actions
 
@@ -41,7 +56,7 @@ domain_join 'foobar' do
   domain_user     'binduser'
   domain_password 'correct-horse-battery-staple'
   ou              'OU=US,OU=West,OU=Web,DC=example,DC=com'
-  server          'DC01' #Optional
+  server          'DC01'
   update_hostname true
   double_reboot true
   visual_warning true
@@ -89,16 +104,27 @@ This cookbook basically runs this powershell command, then reboots
 
 ## Ubuntu
 
-This cookbook has experimental support for joining ubuntu 16.04.   
+ad-join can join ubuntu machines to active directory. (experimental. Bug reports / pull requests encouraged)
 It does not reboot or manage any of the additional files that might be required for a complete ad join
+
+```ruby
+domain_join 'foobar' do
+  domain          'EXAMPLE.COM'
+  domain_user     'binduser'
+  domain_password 'correct-horse-battery-staple'
+  ou              'OU=US,OU=West,OU=Web,DC=example,DC=com'
+  server          'DC01'
+  hide_sensitive true
+  action :join
+end
+```
 
 Common pitfalls
 
-- Ubuntu 16.04 only
 - Hostnames longer than 15 characters will be truncated
 - NetBios names are not supported (Windows 2000 domain controllers )
-- Domain is cAsE SenSITive. In most cases this needs to be all uppercase.
-- Debugging can be difficult, temporarily set `'hide_sensitive' false` to get additional information
+- Domain is cAsE SenSITive. In most cases this needs to be all UPPERCASE.
+- Debugging can be difficult, temporarily set `'hide_sensitive' false` to get additional information. domain_password will be shown in plain text.
 
 **The ad-join cookbook is as unopinionated as possible. It will not configure `sudoers` file, `/etc/pam.d` or `/etc/krb5.conf`. Use the sudoers cookbook in your wrapper cookbook to manage those services. See [test/cookbooks/ad-join-linux directory](./test/cookbooks/ad-join-linux) for examples on how to manage those files**
 
@@ -111,10 +137,6 @@ This cookbook basically runs this bash command
 
 ### Ubuntu
 
-Unable to install packages
-If using chef 12.0 to 12.9 you will need to manually include the apt recipe in the runlist to run `apt-get update`
-If using chef 12.9 or newer, the package resource should auto detect that apt-get update hasn't run yet and run it automatically.
-
 
 ```
 realm: No such realm found
@@ -126,7 +148,7 @@ Realm is case sensitive. Try EXAMPLE.COM instead of example.com
 realm: Not authorized to perform this action
 ```
 
-Not all packages installed successfully. Verify `adcli` and `packagekit` are installed
+Not all packages installed successfully. Verify `adcli` and `packagekit` are installed. Please open github issue if you find missing packages.
 
 ```
 ! Couldn't get kerberos ticket for: foo@example.com: KDC reply did not match expectations
@@ -140,6 +162,7 @@ DNS update failed: NT_STATUS_INVALID_PARAMETER
 ```
 
 Make sure a fqdn is setup `hostname -f`
+
 https://wiki.samba.org/index.php/Troubleshooting_Samba_Domain_Members
 
 License and Authors
