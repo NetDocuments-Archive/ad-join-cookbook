@@ -66,7 +66,7 @@ action :join do
   windows_task 'chef ad-join' do
     task_name 'chef ad-join' # http://bit.ly/1WDZ1kn
     user 'SYSTEM'
-    command 'chef-client -L C:\chef\chef-ad-join.log --config-option exit_status :disabled'
+    command 'chef-client -L C:\chef\chef-ad-join.log'
     run_level :highest
     frequency :onstart
     only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
