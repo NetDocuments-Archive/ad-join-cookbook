@@ -1,3 +1,7 @@
+5.0.1
+-----
+Fix scheduled task not running on windows
+
 5.0.0
 -----
 Adds Ubuntu support  

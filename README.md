@@ -16,20 +16,6 @@ Library cookbook that will join an Active Directory domain
 This cookbook is a library cookbook and is intended to be used by your own wrapper cookbook. See the [test/cookbooks directory](./test/cookbooks) for examples.
 While the examples show running separate cookbooks for windows and linux, this isn't required. It is possible for one wrapper cookbook to manage both windows and linux hosts.
 
-## Windows Reboots in Chef 13
-
-This cookbook will reboot windows machines one or more times.
-
-Chef 12 returns exit code `0` when a machine reboots mid chef run  
-Chef 13 returns exit code `-35` when a windows machine reboots mid chef run  
-
-Test kitchen and knife will consider exit code `-35` an error (it's not). You must take one or more of the following precautions
-
-- Account for exit code `-35` in knife / scripts
-- Add `exit_status :disabled` to client.rb
-
-Unfortunately this creates a chicken and egg situation. **There is currently no way to set `exit_status :disabled` on bootstrap without a custom bootstrap template**. Custom bootstrap templates for windows are not well documented, so you are best off just expecting an exit code of `-35` on your first chef run. See [issue#12 for additional information](https://github.com/NetDocuments/ad-join-cookbook/issues/12)
-
 
 ### Actions
 
