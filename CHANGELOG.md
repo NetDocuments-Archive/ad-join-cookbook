@@ -1,3 +1,8 @@
+5.0.0
+-----
+Adds Ubuntu support  
+Fix Chef 13. Requires 13.4.19 or greater (or >=12.7) (#12, #20, #23)
+
 4.12.1
 ------
 Throws error if running on chef 11 or chef 13
