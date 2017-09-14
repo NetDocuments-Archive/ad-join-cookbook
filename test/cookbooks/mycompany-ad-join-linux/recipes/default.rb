@@ -41,12 +41,14 @@ domain_join 'default' do
 end
 
 if node['os'] == 'linux'
-  node['mycompany-ad-join']['sudoers'].each do |s|
-    sudo s['user'] do
-      name s['name'] if s['name'] # The name of file in /etc/sudoers.d
-      user s['user']
-      runas s['runas'] if s['runas']
-      commands s['commands'] if s['commands']
+  if defined? node['mycompany-ad-join']['sudoers']
+    node['mycompany-ad-join']['sudoers'].each do |s|
+      sudo s['user'] do
+        name s['name'] if s['name'] # The name of file in /etc/sudoers.d
+        user s['user']
+        runas s['runas'] if s['runas']
+        commands s['commands'] if s['commands']
+      end
     end
   end
 
