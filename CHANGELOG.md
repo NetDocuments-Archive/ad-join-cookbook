@@ -1,3 +1,7 @@
+5.0.2
+-----
+Fix leave action on chef 13 (#31)
+
 5.0.1
 -----
 Fix scheduled task not running on windows
