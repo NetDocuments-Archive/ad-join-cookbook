@@ -167,7 +167,8 @@ action :leave do
     start_day '06/09/2016'
     start_time '01:00'
     only_if { node['kernel']['cs_info']['domain_role'].to_i == 1 || node['kernel']['cs_info']['domain_role'].to_i == 3 }
-    action :change
+    # Chef 12 uses :change, Chef 13.4.19 uses :create to modify existing tasks http://bit.ly/2wbDTzP
+    action :change if Gem::Requirement.create('~> 12').satisfied_by?(Gem::Version.create(Chef::VERSION))
   end
 
   powershell_script 'ad-join-leave' do
