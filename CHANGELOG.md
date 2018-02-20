@@ -1,4 +1,9 @@
-5.0.2
+5.0.3
+-----
+
+Work around bug with chef 13
+https://github.com/chef/chef/issues/6824#issuecomment-367141438
+
 -----
 Fix leave action on chef 13 (#31)
 
