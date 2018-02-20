@@ -1,3 +1,7 @@
+5.0.4
+-----
+Fix typo in metadata
+
 5.0.3
 -----
 
