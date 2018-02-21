@@ -76,14 +76,12 @@ action :join do
 
   # Modify the start time to make sure GP doesn't set task into future
   # https://github.com/NetDocuments/ad-join-cookbook/issues/13
-  # schedtask.exe won't allow this to be combined with task creation
-  windows_task 'modify sched task start time' do
-    task_name 'chef ad-join' # http://bit.ly/1WDZ1kn
-    start_day '06/09/2016'
-    start_time '01:00'
-    only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
-    # Chef 12 uses :change, Chef 13.4.19 uses :create to modify existing tasks http://bit.ly/2wbDTzP
-    action :change if Gem::Requirement.create('~> 12').satisfied_by?(Gem::Version.create(Chef::VERSION))
+  # schtasks.exe won't allow this to be combined with task creation
+  powershell_script 'ad-join sched task modify start date' do
+    code <<-EOH
+    schtasks.exe /Change /TN 'chef ad-join' /SD '06/09/2016' /ST '01:00'
+    EOH
+    only_if "schtasks.exe /Query /TN 'chef ad-join'"
   end
 
   powershell_script 'ad-join' do
