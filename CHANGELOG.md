@@ -1,3 +1,7 @@
+5.1.0
+-----
+Change schedule task modify to make more chef 13 friendly
+
 5.0.4
 -----
 Fix typo in metadata
