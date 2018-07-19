@@ -1,3 +1,7 @@
+5.1.1
+-----
+Fix double_reboot error on chef 14 (#37)
+
 5.1.0
 -----
 Change schedule task modify to make more chef 13 friendly
