@@ -32,7 +32,7 @@ action :join do
 
   # https://answers.launchpad.net/ubuntu/+question/293540
   execute 'realm join' do
-    environment 'DOMAIN_PASS' => domain_password
+    environment 'DOMAIN_PASS' => new_resource.domain_password
     command <<-EOH
       echo "${DOMAIN_PASS}" | sudo realm join --verbose #{new_resource.domain} --user #{new_resource.domain_user}@#{new_resource.domain} --computer-ou #{new_resource.ou} --install=/
       EOH
@@ -54,7 +54,7 @@ end
 
 action :leave do
   execute 'realm leave' do
-    environment 'DOMAIN_PASS' => domain_password
+    environment 'DOMAIN_PASS' => new_resource.domain_password
     command <<-EOH
       sudo realm leave
       EOH
