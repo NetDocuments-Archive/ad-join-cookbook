@@ -1,3 +1,7 @@
+5.1.2
+-----
+Fix issue where chef 14 could complain about lack of new_resource definitions (#39)
+
 5.1.1
 -----
 Fix double_reboot error on chef 14 (#37)
