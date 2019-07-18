@@ -4,8 +4,8 @@ property :domain_user, String, required: true
 property :domain_password, String, required: true
 property :ou, [String, NilClass], required: false, default: nil
 property :server, [String, NilClass], required: false, default: nil
-property :update_hostname, [true, false], required: false, default: true
-property :double_reboot, [true, false], required: false, default: true
+property :update_hostname, [true, false], required: false, default: false
+property :double_reboot, [true, false], required: false, default: false
 property :visual_warning, [true, false], required: false, default: true
 property :hide_sensitive, [true, false, NilClass], required: false, default: nil
 
@@ -105,7 +105,7 @@ action :join do
     # Add-Computer -ComputerName Server01 -LocalCredential Server01\Admin01 -DomainName Domain02 -Credential Domain02\Admin02 -Restart -Force
     EOH
     only_if { node['kernel']['cs_info']['domain_role'].to_i == 0 || node['kernel']['cs_info']['domain_role'].to_i == 2 }
-    notifies :reboot_now, 'reboot[Restart Computer]', :immediately
+    #notifies :reboot_now, 'reboot[Restart Computer]', :immediately
   end
 
   # Reboot the computer a second time
@@ -114,7 +114,7 @@ action :join do
     content 'Placed by ad-join cookbook. Cookbook will keep rebooting windows until server is part of a domain and this file exists. DONT DELETE'
     action :create_if_missing
     only_if { new_resource.double_reboot == true }
-    notifies :reboot_now, 'reboot[Restart Computer]', :immediately
+    #notifies :reboot_now, 'reboot[Restart Computer]', :immediately
   end
 
   windows_task 'remove chef ad-join' do
@@ -178,7 +178,7 @@ action :leave do
     Remove-Computer -UnjoinDomainCredential $credential -Force -PassThru
     EOH
     only_if { node['kernel']['cs_info']['domain_role'].to_i == 1 || node['kernel']['cs_info']['domain_role'].to_i == 3 }
-    notifies :reboot_now, 'reboot[Restart Computer]', :immediately
+    #notifies :reboot_now, 'reboot[Restart Computer]', :immediately
   end
 
   file 'C:/Windows/chef-ad-join.txt' do
