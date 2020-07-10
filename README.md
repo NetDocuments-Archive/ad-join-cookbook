@@ -4,7 +4,7 @@ ad-join Cookbook
 Library cookbook that will join an Active Directory domain
 
 
-## Tested OS's
+## Tested OSes
 
 - Windows 2012R2  
 - Ubuntu 14.04 (experimental)
@@ -134,7 +134,7 @@ Realm is case sensitive. Try EXAMPLE.COM instead of example.com
 realm: Not authorized to perform this action
 ```
 
-Not all packages installed successfully. Verify `adcli` and `packagekit` are installed. Please open github issue if you find missing packages.
+Not all packages installed successfully. Verify `adcli` and `packagekit` are installed. Please open a github issue if you find missing packages.
 
 ```
 ! Couldn't get kerberos ticket for: foo@example.com: KDC reply did not match expectations
@@ -147,7 +147,7 @@ The domain is case sensitive. Try changing `example.com` to `EXAMPLE.COM`
 DNS update failed: NT_STATUS_INVALID_PARAMETER
 ```
 
-Make sure a fqdn is setup `hostname -f`
+Make sure a fqdn is set up `hostname -f`
 
 https://wiki.samba.org/index.php/Troubleshooting_Samba_Domain_Members
 
