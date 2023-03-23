@@ -2,5 +2,3 @@
 source :chef_server
 
 metadata
-
-cookbook 'windows'

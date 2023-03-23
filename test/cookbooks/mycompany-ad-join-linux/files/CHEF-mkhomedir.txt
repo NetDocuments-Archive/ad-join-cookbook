@@ -1,3 +1,0 @@
-# MANAGED BY CHEF ad-join cookbook
-# Auto generate home directories for Active Directory Users
-session required    pam_mkhomedir.so skel=/etc/skel/ umask=0022"
